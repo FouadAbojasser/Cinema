@@ -3,13 +3,19 @@
 <section class="hero-area" id="home">
 	<div class="container">
 		<div class="hero-area-slider">
-
 			@foreach (var item in Model.TopRated)
 			{
 				<div class="row hero-area-slide">
 					<div class="col-lg-6 col-md-5">
 						<div class="hero-area-content">
-							<img src="~/img/slide1.png" alt="about" />
+							@foreach(var img in item.Images)
+							{
+								if (img.Type == "slider")
+								{
+									<img src="~/img/sliders/@img.Name" alt="@img.Name" class="px-2 py-4" />
+								}
+							}
+
 						</div>
 					</div>
 					<div class="col-lg-6 col-md-7">
@@ -17,42 +23,45 @@
 							<h2>@item.Title</h2>
 							<div class="review">
 								<div class="author-review">
-									<i class="icofont icofont-star"></i>
-									<i class="icofont icofont-star"></i>
-									<i class="icofont icofont-star"></i>
-									<i class="icofont icofont-star"></i>
-									<i class="icofont icofont-star"></i>
+									@{
+										double rate = item.Rate; // Assuming item.Rate is between 0 and 10
+										double stars = rate / 2; // Convert 0–10 scale to 0–5 stars
+										int fullStars = (int)stars;
+										bool hasHalfStar = (stars - fullStars) >= 0.5;
+										int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+									}
+
+									@for (int i = 0; i < fullStars; i++)
+									{
+										<i class="icofont icofont-star" style="color: gold;"></i> <!-- Full star -->
+									}
+
+									@if (hasHalfStar)
+									{
+										<i class="icofont icofont-star" style="background: linear-gradient(90deg, gold 50%, gray 50%); -webkit-background-clip: text; color: transparent;"></i> <!-- Half star -->
+									}
+
+									@for (int i = 0; i < emptyStars; i++)
+									{
+										<i class="icofont icofont-star" style="color: gray;"></i> <!-- Empty star -->
+									}
 								</div>
 								<h4>@item.Rate</h4>
 							</div>
+
 							<p>@item.Overview</p>
 
 							<h3>Cast:</h3>
 							<div class="slide-cast">
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast1.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast5.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast3.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast4.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast5.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast6.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast7.png" alt="about" />
-								</div>
-								<div class="single-slide-cast text-center">
-									5+
-								</div>
+								@foreach (var actor in item.Actors)
+								{
+
+									<div class="single-slide-cast mx-2">
+										<img src="~/img/cast/@actor.Img" alt="@actor.Img" />
+
+									</div>
+
+								}
 							</div>
 							<div class="slide-trailor">
 								<h3>Watch Trailer</h3>
@@ -63,59 +72,67 @@
 					</div>
 				</div>
 			}
-
 		</div>
 
 
 
 		<div class="hero-area-thumb">
+
 			<div class="thumb-prev">
 				<div class="row hero-area-slide">
 					<div class="col-lg-6">
 						<div class="hero-area-content">
-							<img src="~/img/slide3.png" alt="about" />
+							@foreach (var img in Model.TopRated[0].Images)
+							{
+								if (img.Type == "slider")
+								{
+									<img src="~/img/sliders/@img.Name" alt="@img.Name" class="px-2 py-4" />
+								}
+							}
 						</div>
 					</div>
 					<div class="col-lg-6">
 						<div class="hero-area-content pr-50">
-							<h2>Last Avatar</h2>
+							<h2>@Model.TopRated[0].Title</h2>
 							<div class="review">
 								<div class="author-review">
-									<i class="icofont icofont-star"></i>
-									<i class="icofont icofont-star"></i>
-									<i class="icofont icofont-star"></i>
-									<i class="icofont icofont-star"></i>
-									<i class="icofont icofont-star"></i>
+									@{
+										double rate3 = @Model.TopRated[0].Rate; // Assuming item.Rate is between 0 and 10
+										double stars3 = rate3 / 2; // Convert 0–10 scale to 0–5 stars
+										int fullStars3 = (int)stars3;
+										bool hasHalfStar3 = (stars3 - fullStars3) >= 0.5;
+										int emptyStars3 = 5 - fullStars3 - (hasHalfStar3 ? 1 : 0);
+									}
+
+									@for (int i = 0; i < fullStars3; i++)
+									{
+										<i class="icofont icofont-star" style="color: gold;"></i> <!-- Full star -->
+									}
+
+									@if (hasHalfStar3)
+									{
+										<i class="icofont icofont-star" style="background: linear-gradient(90deg, gold 50%, gray 50%); -webkit-background-clip: text; color: transparent;"></i> <!-- Half star -->
+									}
+
+									@for (int i = 0; i < emptyStars3; i++)
+									{
+										<i class="icofont icofont-star" style="color: gray;"></i> <!-- Empty star -->
+									}
 								</div>
-								<h4>180k voters</h4>
+								<h4>@Model.TopRated[0].Rate</h4>
 							</div>
-							<p>She is a devil princess from the demon world. She grew up sheltered by her parents and doesn't really know how to be evil or any of the common actions,   She is unable to cry due to Keita's accidental first wish, despite needed for him to wish...</p>
+							<p>@Model.TopRated[0].Overview</p>
 							<h3>Cast:</h3>
 							<div class="slide-cast">
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast1.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast2.html" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast3.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast4.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast5.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast6.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast7.png" alt="about" />
-								</div>
-								<div class="single-slide-cast text-center">
-									5+
-								</div>
+								@foreach (var actor in Model.TopRated[0].Actors)
+								{
+
+									<div class="single-slide-cast mx-2">
+										<img src="~/img/cast/@actor.Img" alt="@actor.Img" />
+
+									</div>
+
+								}
 							</div>
 							<div class="slide-trailor">
 								<h3>Watch Trailer</h3>
@@ -125,53 +142,62 @@
 					</div>
 				</div>
 			</div>
+
 			<div class="thumb-next">
 				<div class="row hero-area-slide">
 					<div class="col-lg-6">
 						<div class="hero-area-content">
-							<img src="~/img/slide1.png" alt="about" />
+							@foreach (var img in Model.TopRated[1].Images)
+							{
+								if (img.Type == "slider")
+								{
+									<img src="~/img/sliders/@img.Name" alt="@img.Name" class="px-2 py-4" />
+								}
+							}
 						</div>
 					</div>
 					<div class="col-lg-6">
 						<div class="hero-area-content pr-50">
-							<h2>The Deer God</h2>
+							<h2>@Model.TopRated[0].Title</h2>
 							<div class="review">
 								<div class="author-review">
-									<i class="icofont icofont-star"></i>
-									<i class="icofont icofont-star"></i>
-									<i class="icofont icofont-star"></i>
-									<i class="icofont icofont-star"></i>
-									<i class="icofont icofont-star"></i>
+									@{
+										double rate4 = @Model.TopRated[1].Rate; // Assuming item.Rate is between 0 and 10
+										double stars4 = rate4 / 2; // Convert 0–10 scale to 0–5 stars
+										int fullStars4 = (int)stars4;
+										bool hasHalfStar4 = (stars4 - fullStars4) >= 0.5;
+										int emptyStars4 = 5 - fullStars4 - (hasHalfStar4 ? 1 : 0);
+									}
+
+									@for (int i = 0; i < fullStars4; i++)
+									{
+										<i class="icofont icofont-star" style="color: gold;"></i> <!-- Full star -->
+									}
+
+									@if (hasHalfStar4)
+									{
+										<i class="icofont icofont-star" style="background: linear-gradient(90deg, gold 50%, gray 50%); -webkit-background-clip: text; color: transparent;"></i> <!-- Half star -->
+									}
+
+									@for (int i = 0; i < emptyStars4; i++)
+									{
+										<i class="icofont icofont-star" style="color: gray;"></i> <!-- Empty star -->
+									}
 								</div>
-								<h4>180k voters</h4>
+								<h4>@Model.TopRated[1].Rate</h4>
 							</div>
-							<p>She is a devil princess from the demon world. She grew up sheltered by her parents and doesn't really know how to be evil or any of the common actions,   She is unable to cry due to Keita's accidental first wish, despite needed for him to wish...</p>
+							<p>@Model.TopRated[1].Overview</p>
 							<h3>Cast:</h3>
 							<div class="slide-cast">
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast1.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast2.html" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast3.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast4.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast5.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast6.png" alt="about" />
-								</div>
-								<div class="single-slide-cast">
-									<img src="~/img/cast/cast7.png" alt="about" />
-								</div>
-								<div class="single-slide-cast text-center">
-									5+
-								</div>
+								@foreach (var actor in Model.TopRated[1].Actors)
+								{
+
+									<div class="single-slide-cast mx-2">
+										<img src="~/img/cast/@actor.Img" alt="@actor.Img" />
+
+									</div>
+
+								}
 							</div>
 							<div class="slide-trailor">
 								<h3>Watch Trailer</h3>
@@ -181,6 +207,9 @@
 					</div>
 				</div>
 			</div>
+
+
+
 		</div>
 	</div>
 </section><!-- hero area end -->
@@ -198,7 +227,7 @@
 			<div class="col-lg-6 text-center text-lg-right">
 				<div class="portfolio-menu">
 					<ul>
-						<li data-filter="*" class="active">Latest</li>
+						<li data-filter="*" class="active">All</li>
 						<li data-filter=".soon">Comming Soon</li>
 						<li data-filter=".top">Top Rated</li>
 						<li data-filter=".released">Recently Released</li>
@@ -206,166 +235,222 @@
 				</div>
 			</div>
 		</div>
-		<hr />
+		<hr/>
+
 		<div class="row">
-			<div class="col-lg-9">
+			<div class="col text-center">
 				<div class="row portfolio-item">
-					<!--Film Card Start-->
-					<div class="col-md-4 col-sm-6 soon released">
-						<a href="/Home/MovieDetails" class="single-portfolio-link">
+
+					@foreach (var movie in Model.Latest)
+					{
+						<div class="col-md-4 col-sm-6 latest">
 							<div class="single-portfolio">
 								<div class="single-portfolio-img">
-									<img src="~/img/portfolio/portfolio1.png" alt="portfolio" />
-									<a href="https://www.youtube.com/watch?v=RZXnugbhw_4" class="popup-youtube">
+									@foreach (var img in movie.Images)
+									{
+										@if (img.Type == "slider")
+										{
+											<img src="~/img/sliders/@img.Name" alt="@img.Name" />
+										}
+										
+									}
+									<a href="@movie.Trailer" class="popup-youtube">
 										<i class="icofont icofont-ui-play"></i>
 									</a>
 								</div>
-								<div class="portfolio-content">
-									<h2>Boyz II Men</h2>
-									<div class="review">
-										<div class="author-review">
-											<i class="icofont icofont-star"></i>
-											<i class="icofont icofont-star"></i>
-											<i class="icofont icofont-star"></i>
-											<i class="icofont icofont-star"></i>
-											<i class="icofont icofont-star"></i>
-										</div>
-										<h4>180k voters</h4>
-									</div>
-								</div>
-							</div>
-						</a>
-					</div>
-					<!--Film Card End-->
+								<div class="portfolio-content text-center">
+									<h2 class="mb-1">@movie.Title</h2>
+									<div class="d-flex justify-content-center align-items-center">
+										<div class="author-review me-0">
+											@{
+												double rate = movie.Rate; // Assuming rate is between 0-10
+												double stars = rate / 2; // 5 stars max
+												int fullStars = (int)stars; // Number of full yellow stars
+												bool hasHalfStar = (stars - fullStars) >= 0.5;
+												int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+											}
 
-					<div class="col-md-4 col-sm-6 top">
-						<div class="single-portfolio">
-							<div class="single-portfolio-img">
-								<img src="~/img/portfolio/portfolio2.png" alt="portfolio" />
-								<a href="https://www.youtube.com/watch?v=RZXnugbhw_4" class="popup-youtube">
-									<i class="icofont icofont-ui-play"></i>
-								</a>
-							</div>
-							<div class="portfolio-content">
-								<h2>Tale of Revemge</h2>
-								<div class="review">
-									<div class="author-review">
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
+											@for (int i = 0; i < fullStars; i++)
+											{
+												<i class="icofont icofont-star mx-0" style="color: gold;"></i> <!-- Full yellow star -->
+											}
+
+											@if (hasHalfStar)
+											{
+												<i class="icofont icofont-star mx-0" style="background: linear-gradient(90deg, gold 50%, gray 50%); -webkit-background-clip: text; color: transparent;"></i> <!-- Half star -->
+											}
+
+											@for (int i = 0; i < emptyStars; i++)
+											{
+												<i class="icofont icofont-star mx-0" style="color: gray;"></i> <!-- Empty gray star -->
+											}
+										</div>
+										<h4 class="m-3">@movie.Rate</h4>
 									</div>
-									<h4>180k voters</h4>
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="col-md-4 col-sm-6 soon">
-						<div class="single-portfolio">
-							<div class="single-portfolio-img">
-								<img src="~/img/portfolio/portfolio3.png" alt="portfolio" />
-								<a href="https://www.youtube.com/watch?v=RZXnugbhw_4" class="popup-youtube">
-									<i class="icofont icofont-ui-play"></i>
-								</a>
-							</div>
-							<div class="portfolio-content">
-								<h2>The Lost City of Z</h2>
-								<div class="review">
-									<div class="author-review">
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
+					}
+					@foreach (var movie in Model.CommingSoon)
+					{
+						<div class="col-md-4 col-sm-6 soon">
+							<div class="single-portfolio">
+								<div class="single-portfolio-img">
+									@foreach (var img in movie.Images)
+									{
+										@if (img.Type == "slider")
+										{
+											<img src="~/img/sliders/@img.Name" alt="@img.Name" />
+										}
+										
+									}
+									<a href="@movie.Trailer" class="popup-youtube">
+										<i class="icofont icofont-ui-play"></i>
+									</a>
+								</div>
+								<div class="portfolio-content text-center">
+									<h2 class="mb-1">@movie.Title</h2>
+									<div class="d-flex justify-content-center align-items-center">
+										<div class="author-review me-0">
+											@{
+												double rate = movie.Rate; // Assuming rate is between 0-10
+												double stars = rate / 2; // 5 stars max
+												int fullStars = (int)stars; // Number of full yellow stars
+												bool hasHalfStar = (stars - fullStars) >= 0.5;
+												int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+											}
+
+											@for (int i = 0; i < fullStars; i++)
+											{
+												<i class="icofont icofont-star mx-0" style="color: gold;"></i> <!-- Full yellow star -->
+											}
+
+											@if (hasHalfStar)
+											{
+												<i class="icofont icofont-star mx-0" style="background: linear-gradient(90deg, gold 50%, gray 50%); -webkit-background-clip: text; color: transparent;"></i> <!-- Half star -->
+											}
+
+											@for (int i = 0; i < emptyStars; i++)
+											{
+												<i class="icofont icofont-star mx-0" style="color: gray;"></i> <!-- Empty gray star -->
+											}
+										</div>
+										<h4 class="m-3">@movie.Rate</h4>
 									</div>
-									<h4>180k voters</h4>
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="col-md-4 col-sm-6 top released">
-						<div class="single-portfolio">
-							<div class="single-portfolio-img">
-								<img src="~/img/portfolio/portfolio4.png" alt="portfolio" />
-								<a href="https://www.youtube.com/watch?v=RZXnugbhw_4" class="popup-youtube">
-									<i class="icofont icofont-ui-play"></i>
-								</a>
-							</div>
-							<div class="portfolio-content">
-								<h2>Beast Beauty</h2>
-								<div class="review">
-									<div class="author-review">
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
+					}
+					@foreach (var movie in Model.TopRated)
+					{
+						<div class="col-md-4 col-sm-6 top">
+							<div class="single-portfolio">
+								<div class="single-portfolio-img">
+									@foreach (var img in movie.Images)
+									{
+										@if (img.Type == "slider")
+										{
+											<img src="~/img/sliders/@img.Name" alt="@img.Name" />
+										}
+
+									}
+									<a href="@movie.Trailer" class="popup-youtube">
+										<i class="icofont icofont-ui-play"></i>
+									</a>
+								</div>
+								<div class="portfolio-content text-center">
+									<h2 class="mb-1">@movie.Title</h2>
+									<div class="d-flex justify-content-center align-items-center">
+										<div class="author-review me-0">
+											@{
+												double rate = movie.Rate; // Assuming rate is between 0-10
+												double stars = rate / 2; // 5 stars max
+												int fullStars = (int)stars; // Number of full yellow stars
+												bool hasHalfStar = (stars - fullStars) >= 0.5;
+												int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+											}
+
+											@for (int i = 0; i < fullStars; i++)
+											{
+												<i class="icofont icofont-star mx-0" style="color: gold;"></i> <!-- Full yellow star -->
+											}
+
+											@if (hasHalfStar)
+											{
+												<i class="icofont icofont-star mx-0" style="background: linear-gradient(90deg, gold 50%, gray 50%); -webkit-background-clip: text; color: transparent;"></i> <!-- Half star -->
+											}
+
+											@for (int i = 0; i < emptyStars; i++)
+											{
+												<i class="icofont icofont-star mx-0" style="color: gray;"></i> <!-- Empty gray star -->
+											}
+										</div>
+										<h4 class="m-3">@movie.Rate</h4>
 									</div>
-									<h4>180k voters</h4>
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="col-md-4 col-sm-6 released">
-						<div class="single-portfolio">
-							<div class="single-portfolio-img">
-								<img src="~/img/portfolio/portfolio5.png" alt="portfolio" />
-								<a href="https://www.youtube.com/watch?v=RZXnugbhw_4" class="popup-youtube">
-									<i class="icofont icofont-ui-play"></i>
-								</a>
-							</div>
-							<div class="portfolio-content">
-								<h2>In The Fade</h2>
-								<div class="review">
-									<div class="author-review">
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
+					}
+					@foreach (var movie in Model.RecentlyReleased)
+					{
+						<div class="col-md-4 col-sm-6 released">
+							<div class="single-portfolio">
+								<div class="single-portfolio-img">
+									@foreach (var img in movie.Images)
+									{
+										@if (img.Type == "slider")
+										{
+											<img src="~/img/sliders/@img.Name" alt="@img.Name" />
+										}
+
+									}
+									<a href="@movie.Trailer" class="popup-youtube">
+										<i class="icofont icofont-ui-play"></i>
+									</a>
+								</div>
+								<div class="portfolio-content text-center">
+									<h2 class="mb-1">@movie.Title</h2>
+									<div class="d-flex justify-content-center align-items-center">
+										<div class="author-review me-0">
+											@{
+												double rate = movie.Rate; // Assuming rate is between 0-10
+												double stars = rate / 2; // 5 stars max
+												int fullStars = (int)stars; // Number of full yellow stars
+												bool hasHalfStar = (stars - fullStars) >= 0.5;
+												int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+											}
+
+											@for (int i = 0; i < fullStars; i++)
+											{
+												<i class="icofont icofont-star mx-0" style="color: gold;"></i> <!-- Full yellow star -->
+											}
+
+											@if (hasHalfStar)
+											{
+												<i class="icofont icofont-star mx-0" style="background: linear-gradient(90deg, gold 50%, gray 50%); -webkit-background-clip: text; color: transparent;"></i> <!-- Half star -->
+											}
+
+											@for (int i = 0; i < emptyStars; i++)
+											{
+												<i class="icofont icofont-star mx-0" style="color: gray;"></i> <!-- Empty gray star -->
+											}
+										</div>
+										<h4 class="m-3">@movie.Rate</h4>
 									</div>
-									<h4>180k voters</h4>
+
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="col-md-4 col-sm-6 soon top">
-						<div class="single-portfolio">
-							<div class="single-portfolio-img">
-								<img src="~/img/portfolio/portfolio6.png" alt="portfolio" />
-								<a href="https://www.youtube.com/watch?v=RZXnugbhw_4" class="popup-youtube">
-									<i class="icofont icofont-ui-play"></i>
-								</a>
-							</div>
-							<div class="portfolio-content">
-								<h2>Last Hero</h2>
-								<div class="review">
-									<div class="author-review">
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-										<i class="icofont icofont-star"></i>
-									</div>
-									<h4>180k voters</h4>
-								</div>
-							</div>
-						</div>
-					</div>
+					}
+
 				</div>
 			</div>
-			<div class="col-lg-3 text-center text-lg-left">
-				<div class="portfolio-sidebar">
-					<img src="~/img/sidebar/sidebar1.png" alt="sidebar" />
-					<img src="~/img/sidebar/sidebar2.png" alt="sidebar" />
-					<img src="~/img/sidebar/sidebar3.png" alt="sidebar" />
-					<img src="~/img/sidebar/sidebar4.png" alt="sidebar" />
-				</div>
-			</div>
+			
 		</div>
 	</div>
 </section><!-- portfolio section end -->
+
+
 
 <!-- video section start -->
 <section class="video ptb-90">
@@ -381,48 +466,107 @@
 		<div class="row">
 			<div class="col-md-9">
 				<div class="video-area">
-					<img src="~/img/video/video1.png" alt="video" />
-					<a href="https://www.youtube.com/watch?v=RZXnugbhw_4" class="popup-youtube">
+					@foreach (var img in Model.TopTrailerSection[0].Images)
+					{
+						@if (img.Type == "video_image")
+						{
+							<img src="~/img/video/@img.Name" alt="@img.Name" />
+						}
+
+					}
+					<a href="@Model.TopTrailerSection[0].Trailer" class="popup-youtube">
 						<i class="icofont icofont-ui-play"></i>
 					</a>
 					<div class="video-text">
-						<h2>Angle of Death</h2>
+						<h2>@Model.TopTrailerSection[0].Title</h2>
 						<div class="review">
 							<div class="author-review">
-								<i class="icofont icofont-star"></i>
-								<i class="icofont icofont-star"></i>
-								<i class="icofont icofont-star"></i>
-								<i class="icofont icofont-star"></i>
-								<i class="icofont icofont-star"></i>
+								@{
+									double rate2 = Model.TopTrailerSection[0].Rate; // Assuming rate is between 0-10
+									double stars2 = rate2 / 2; // Max 5 stars
+									int fullStars2 = (int)stars2;
+									bool hasHalfStar2 = (stars2 - fullStars2) >= 0.5;
+									int emptyStars2 = 5 - fullStars2 - (hasHalfStar2 ? 1 : 0);
+								}
+
+								@for (int i = 0; i < fullStars2; i++)
+								{
+									<i class="icofont icofont-star" style="color: gold;"></i> <!-- Full yellow star -->
+								}
+
+								@if (hasHalfStar2)
+								{
+									<i class="icofont icofont-star" style="background: linear-gradient(90deg, gold 50%, gray 50%); -webkit-background-clip: text; color: transparent;"></i> <!-- Half star -->
+								}
+
+								@for (int i = 0; i < emptyStars2; i++)
+								{
+									<i class="icofont icofont-star" style="color: gray;"></i> <!-- Empty gray star -->
+								}
 							</div>
-							<h4>180k voters</h4>
+							<h4>@Model.TopTrailerSection[0].Rate</h4>
 						</div>
 					</div>
 				</div>
+
 			</div>
 			<div class="col-md-3">
 				<div class="row">
 					<div class="col-md-12 col-sm-6">
-						<div class="video-area">
-							<img src="~/img/video/video2.png" alt="video" />
-							<a href="https://www.youtube.com/watch?v=RZXnugbhw_4" class="popup-youtube">
+						<div class="video-area" >
+							@foreach (var img in Model.TopTrailerSection[1].Images)
+							{
+								@if (img.Type == "video_image")
+								{
+									<img src="~/img/video/@img.Name" alt="@img.Name" />
+								}
+
+							}
+							<a href="@Model.TopTrailerSection[1].Trailer" class="popup-youtube">
 								<i class="icofont icofont-ui-play"></i>
 							</a>
 						</div>
 					</div>
+
 					<div class="col-md-12 col-sm-6">
-						<div class="video-area">
-							<img src="~/img/video/video3.png" alt="video" />
-							<a href="https://www.youtube.com/watch?v=RZXnugbhw_4" class="popup-youtube">
+						<div class="video-area my-3">
+							@foreach (var img in Model.TopTrailerSection[2].Images)
+							{
+								@if (img.Type == "video_image")
+								{
+									<img src="~/img/video/@img.Name" alt="@img.Name" />
+								}
+
+							}
+							<a href="@Model.TopTrailerSection[2].Trailer" class="popup-youtube">
 								<i class="icofont icofont-ui-play"></i>
 							</a>
 						</div>
 					</div>
+
+					<div class="col-md-12 col-sm-6 mt-0">
+						<div class="video-area mt-0">
+							@foreach (var img in Model.TopTrailerSection[3].Images)
+							{
+								@if (img.Type == "video_image")
+								{
+									<img src="~/img/video/@img.Name" alt="@img.Name" />
+								}
+
+							}
+							<a href="@Model.TopTrailerSection[3].Trailer" class="popup-youtube">
+								<i class="icofont icofont-ui-play"></i>
+							</a>
+						</div>
+					</div>
+
 				</div>
 			</div>
 		</div>
 	</div>
 </section><!-- video section end -->
+
+
 
 <!-- news section start -->
 <section class="news">
@@ -507,4 +651,3 @@
 		</div>
 	</div>
 </section><!-- news section end -->
-

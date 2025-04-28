@@ -4,10 +4,11 @@
     {
         public int Id { get; set; }
         public string Title { get; set; }
-        public string Overview { get; set; }
-        public string Trailer { get; set; }
+        public string Overview { get; set; } = string.Empty;
+        public string Trailer { get; set; } = string.Empty;
         public DateOnly ProductionDate { get; set; }
-        public string Duration { get; set; }
+        public DateOnly ReleaseDate { get; set; }
+        public string Duration { get; set; } = string.Empty;
         public double Rate { get; set; }
         public int Season { get; set; }
         public int Episodes { get; set; }

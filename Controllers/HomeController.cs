@@ -28,12 +28,14 @@ namespace Cinema.Controllers
 
             var Latest = _dbcontext.Movies
                 .Where(e => e.ProductionDate < today)
+                .Include(e => e.Images)
                 .OrderByDescending(e => e.ProductionDate)
                 .Take(6);
 
 
             var TopRated = _dbcontext.Movies
-                .Include(e => e.Genres) 
+                .Include(e => e.Actors) 
+                .Include(e => e.Images)
                 .OrderByDescending(e => e.Rate) 
                 .ThenByDescending(e => e.ProductionDate) 
                 .Take(6);
@@ -41,24 +43,36 @@ namespace Cinema.Controllers
 
 
             var CommingSoon = _dbcontext.Movies
-                .Where(e => e.ProductionDate >= today)
-                .OrderByDescending(e => e.ProductionDate)
+                .Where(e => e.ReleaseDate >= today)
+                .Include(e => e.Images)
+                .OrderByDescending(e => e.ReleaseDate)
                 .Take(6);
 
 
 
             var RecentlyReleased = _dbcontext.Movies
                 .Where(e => e.ProductionDate < today)
+                .Include(e => e.Images)
                 .OrderByDescending(e => e.ProductionDate)
                 .Take(6);
 
 
+            var TopTrailerSection = _dbcontext.Movies
+                .Include(e => e.Genres)
+                .Include(e => e.Images)
+                .OrderByDescending(e => e.Rate)
+                .ThenByDescending(e => e.ReleaseDate)
+                .Take(4);
+
+
             var MoviesReturnData = new MoviesWithFiltersVM()
             {
+
                 Latest = Latest.ToList(),
                 TopRated = TopRated.ToList(),
                 CommingSoon = CommingSoon.ToList(),
                 RecentlyReleased = RecentlyReleased.ToList(),
+                TopTrailerSection = TopTrailerSection.ToList(),
 
             };
 
