@@ -1,4 +1,5 @@
-﻿@model Cinema.Models.ViewModels.MoviesWithFiltersVM
+﻿@using Cinema.Models.ViewModels
+@model MoviesWithFiltersVM
 <!-- hero area start -->
 <section class="hero-area" id="home">
 	<div class="container">
@@ -20,12 +21,16 @@
 					</div>
 					<div class="col-lg-6 col-md-7">
 						<div class="hero-area-content pr-50">
-							<h2>@item.Title</h2>
+							<h2>
+								<a href="/Home/MovieDetails/@item.Id" class="text-white">
+									@item.Title
+								</a>
+							</h2>
 							<div class="review">
 								<div class="author-review">
 									@{
-										double rate = item.Rate; // Assuming item.Rate is between 0 and 10
-										double stars = rate / 2; // Convert 0–10 scale to 0–5 stars
+										double rate = item.Rate; 
+										double stars = rate / 2; 
 										int fullStars = (int)stars;
 										bool hasHalfStar = (stars - fullStars) >= 0.5;
 										int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
@@ -55,16 +60,19 @@
 							<div class="slide-cast">
 								@foreach (var actor in item.Actors)
 								{
-
 									<div class="single-slide-cast mx-2">
-										<img src="~/img/cast/@actor.Img" alt="@actor.Img" />
-
+										<a href="/Home/ActorDetails/@actor.Id">
+											<img src="~/img/cast/avatar/@actor.Img" alt="@actor.Img" />
+										</a>
 									</div>
-
 								}
 							</div>
 							<div class="slide-trailor">
-								<h3>Watch Trailer</h3>
+								<h3>
+									<a href="@item.Trailer" class="popup-youtube">
+										Watch Trailer
+									</a>
+								</h3>
 								<a class="theme-btn theme-btn2" href="#"><i class="icofont icofont-play"></i> Tickets</a>
 							</div>
 
@@ -74,143 +82,78 @@
 			}
 		</div>
 
-
-
+		<!--Right and Left Sides of Slider -->
 		<div class="hero-area-thumb">
-
-			<div class="thumb-prev">
-				<div class="row hero-area-slide">
-					<div class="col-lg-6">
-						<div class="hero-area-content">
-							@foreach (var img in Model.TopRated[0].Images)
-							{
-								if (img.Type == "slider")
+			@for (int i = 0; i < 2; i++)
+			{
+				var thumbClass = i == 0 ? "thumb-prev" : "thumb-next";
+				<div class="@thumbClass">
+					<div class="row hero-area-slide">
+						<div class="col-lg-6">
+							<div class="hero-area-content">
+								@foreach (var img in Model.TopRated[i].Images)
 								{
-									<img src="~/img/sliders/@img.Name" alt="@img.Name" class="px-2 py-4" />
+									if (img.Type == "slider")
+									{
+										<img src="~/img/sliders/@img.Name" alt="@img.Name" class="px-2 py-4" />
+									}
 								}
-							}
+							</div>
 						</div>
-					</div>
-					<div class="col-lg-6">
-						<div class="hero-area-content pr-50">
-							<h2>@Model.TopRated[0].Title</h2>
-							<div class="review">
-								<div class="author-review">
-									@{
-										double rate3 = @Model.TopRated[0].Rate; // Assuming item.Rate is between 0 and 10
-										double stars3 = rate3 / 2; // Convert 0–10 scale to 0–5 stars
-										int fullStars3 = (int)stars3;
-										bool hasHalfStar3 = (stars3 - fullStars3) >= 0.5;
-										int emptyStars3 = 5 - fullStars3 - (hasHalfStar3 ? 1 : 0);
-									}
 
-									@for (int i = 0; i < fullStars3; i++)
-									{
-										<i class="icofont icofont-star" style="color: gold;"></i> <!-- Full star -->
-									}
+						<div class="col-lg-6">
+							<div class="hero-area-content pr-50">
+								<h2>@Model.TopRated[i].Title</h2>
+								<div class="review">
+									<div class="author-review">
+										@{
+											double rate = Model.TopRated[i].Rate; 
+											double stars = rate / 2; 
+											int fullStars = (int)stars;
+											bool hasHalfStar = (stars - fullStars) >= 0.5;
+											int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+										}
 
-									@if (hasHalfStar3)
-									{
-										<i class="icofont icofont-star" style="background: linear-gradient(90deg, gold 50%, gray 50%); -webkit-background-clip: text; color: transparent;"></i> <!-- Half star -->
-									}
+										@for (int star = 0; star < fullStars; star++)
+										{
+											<i class="icofont icofont-star" style="color: gold;"></i> <!-- Full star -->
+										}
 
-									@for (int i = 0; i < emptyStars3; i++)
+										@if (hasHalfStar)
+										{
+											<i class="icofont icofont-star" style="background: linear-gradient(90deg, gold 50%, gray 50%); -webkit-background-clip: text; color: transparent;"></i> <!-- Half star -->
+										}
+
+										@for (int star = 0; star < emptyStars; star++)
+										{
+											<i class="icofont icofont-star" style="color: gray;"></i> <!-- Empty star -->
+										}
+									</div>
+									<h4>@Model.TopRated[i].Rate</h4>
+								</div>
+								<p>@Model.TopRated[i].Overview</p>
+								<h3>Cast:</h3>
+								<div class="slide-cast">
+									@foreach (var actor in Model.TopRated[i].Actors)
 									{
-										<i class="icofont icofont-star" style="color: gray;"></i> <!-- Empty star -->
+										<div class="single-slide-cast mx-2">
+											<img src="~/img/cast/@actor.Img" alt="@actor.Img" />
+										</div>
 									}
 								</div>
-								<h4>@Model.TopRated[0].Rate</h4>
-							</div>
-							<p>@Model.TopRated[0].Overview</p>
-							<h3>Cast:</h3>
-							<div class="slide-cast">
-								@foreach (var actor in Model.TopRated[0].Actors)
-								{
-
-									<div class="single-slide-cast mx-2">
-										<img src="~/img/cast/@actor.Img" alt="@actor.Img" />
-
-									</div>
-
-								}
-							</div>
-							<div class="slide-trailor">
-								<h3>Watch Trailer</h3>
-								<a class="theme-btn theme-btn2" href="#"><i class="icofont icofont-play"></i> Tickets</a>
+								<div class="slide-trailor">
+									<h3>Watch Trailer</h3>
+									<a class="theme-btn theme-btn2" href="#"><i class="icofont icofont-play"></i> Tickets</a>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-
-			<div class="thumb-next">
-				<div class="row hero-area-slide">
-					<div class="col-lg-6">
-						<div class="hero-area-content">
-							@foreach (var img in Model.TopRated[1].Images)
-							{
-								if (img.Type == "slider")
-								{
-									<img src="~/img/sliders/@img.Name" alt="@img.Name" class="px-2 py-4" />
-								}
-							}
-						</div>
-					</div>
-					<div class="col-lg-6">
-						<div class="hero-area-content pr-50">
-							<h2>@Model.TopRated[0].Title</h2>
-							<div class="review">
-								<div class="author-review">
-									@{
-										double rate4 = @Model.TopRated[1].Rate; // Assuming item.Rate is between 0 and 10
-										double stars4 = rate4 / 2; // Convert 0–10 scale to 0–5 stars
-										int fullStars4 = (int)stars4;
-										bool hasHalfStar4 = (stars4 - fullStars4) >= 0.5;
-										int emptyStars4 = 5 - fullStars4 - (hasHalfStar4 ? 1 : 0);
-									}
-
-									@for (int i = 0; i < fullStars4; i++)
-									{
-										<i class="icofont icofont-star" style="color: gold;"></i> <!-- Full star -->
-									}
-
-									@if (hasHalfStar4)
-									{
-										<i class="icofont icofont-star" style="background: linear-gradient(90deg, gold 50%, gray 50%); -webkit-background-clip: text; color: transparent;"></i> <!-- Half star -->
-									}
-
-									@for (int i = 0; i < emptyStars4; i++)
-									{
-										<i class="icofont icofont-star" style="color: gray;"></i> <!-- Empty star -->
-									}
-								</div>
-								<h4>@Model.TopRated[1].Rate</h4>
-							</div>
-							<p>@Model.TopRated[1].Overview</p>
-							<h3>Cast:</h3>
-							<div class="slide-cast">
-								@foreach (var actor in Model.TopRated[1].Actors)
-								{
-
-									<div class="single-slide-cast mx-2">
-										<img src="~/img/cast/@actor.Img" alt="@actor.Img" />
-
-									</div>
-
-								}
-							</div>
-							<div class="slide-trailor">
-								<h3>Watch Trailer</h3>
-								<a class="theme-btn theme-btn2" href="#"><i class="icofont icofont-play"></i> Tickets</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-
-
+			}
 		</div>
+		<!--End of Right and Left Sides of Slider -->
+
+
 	</div>
 </section><!-- hero area end -->
 
@@ -252,20 +195,25 @@
 										{
 											<img src="~/img/sliders/@img.Name" alt="@img.Name" />
 										}
-										
+
 									}
 									<a href="@movie.Trailer" class="popup-youtube">
 										<i class="icofont icofont-ui-play"></i>
 									</a>
 								</div>
 								<div class="portfolio-content text-center">
-									<h2 class="mb-1">@movie.Title</h2>
+									<h2 class="mb-1">
+										<a href="/Home/MovieDetails/@movie.Id" class="text-white">
+											@movie.Title
+										</a>
+									</h2>
+
 									<div class="d-flex justify-content-center align-items-center">
 										<div class="author-review me-0">
 											@{
-												double rate = movie.Rate; // Assuming rate is between 0-10
-												double stars = rate / 2; // 5 stars max
-												int fullStars = (int)stars; // Number of full yellow stars
+												double rate = movie.Rate; 
+												double stars = rate / 2; 
+												int fullStars = (int)stars; 
 												bool hasHalfStar = (stars - fullStars) >= 0.5;
 												int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 											}
@@ -291,6 +239,7 @@
 							</div>
 						</div>
 					}
+
 					@foreach (var movie in Model.CommingSoon)
 					{
 						<div class="col-md-4 col-sm-6 soon">
@@ -302,20 +251,24 @@
 										{
 											<img src="~/img/sliders/@img.Name" alt="@img.Name" />
 										}
-										
+
 									}
 									<a href="@movie.Trailer" class="popup-youtube">
 										<i class="icofont icofont-ui-play"></i>
 									</a>
 								</div>
 								<div class="portfolio-content text-center">
-									<h2 class="mb-1">@movie.Title</h2>
+									<h2 class="mb-1">
+										<a href="/Home/MovieDetails/@movie.Id" class="text-white">
+											@movie.Title
+										</a>
+									</h2>
 									<div class="d-flex justify-content-center align-items-center">
 										<div class="author-review me-0">
 											@{
-												double rate = movie.Rate; // Assuming rate is between 0-10
-												double stars = rate / 2; // 5 stars max
-												int fullStars = (int)stars; // Number of full yellow stars
+												double rate = movie.Rate; 
+												double stars = rate / 2; 
+												int fullStars = (int)stars; 
 												bool hasHalfStar = (stars - fullStars) >= 0.5;
 												int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 											}
@@ -341,6 +294,7 @@
 							</div>
 						</div>
 					}
+
 					@foreach (var movie in Model.TopRated)
 					{
 						<div class="col-md-4 col-sm-6 top">
@@ -359,13 +313,17 @@
 									</a>
 								</div>
 								<div class="portfolio-content text-center">
-									<h2 class="mb-1">@movie.Title</h2>
+									<h2 class="mb-1">
+										<a href="/Home/MovieDetails/@movie.Id" class="text-white">
+											@movie.Title
+										</a>
+									</h2>
 									<div class="d-flex justify-content-center align-items-center">
 										<div class="author-review me-0">
 											@{
-												double rate = movie.Rate; // Assuming rate is between 0-10
-												double stars = rate / 2; // 5 stars max
-												int fullStars = (int)stars; // Number of full yellow stars
+												double rate = movie.Rate; 
+												double stars = rate / 2; 
+												int fullStars = (int)stars; 
 												bool hasHalfStar = (stars - fullStars) >= 0.5;
 												int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 											}
@@ -409,13 +367,17 @@
 									</a>
 								</div>
 								<div class="portfolio-content text-center">
-									<h2 class="mb-1">@movie.Title</h2>
+									<h2 class="mb-1">
+										<a href="/Home/MovieDetails/@movie.Id" class="text-white">
+											@movie.Title
+										</a>
+									</h2>
 									<div class="d-flex justify-content-center align-items-center">
 										<div class="author-review me-0">
 											@{
-												double rate = movie.Rate; // Assuming rate is between 0-10
-												double stars = rate / 2; // 5 stars max
-												int fullStars = (int)stars; // Number of full yellow stars
+												double rate = movie.Rate; 
+												double stars = rate / 2; 
+												int fullStars = (int)stars; 
 												bool hasHalfStar = (stars - fullStars) >= 0.5;
 												int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 											}
@@ -445,7 +407,6 @@
 
 				</div>
 			</div>
-			
 		</div>
 	</div>
 </section><!-- portfolio section end -->
@@ -482,8 +443,8 @@
 						<div class="review">
 							<div class="author-review">
 								@{
-									double rate2 = Model.TopTrailerSection[0].Rate; // Assuming rate is between 0-10
-									double stars2 = rate2 / 2; // Max 5 stars
+									double rate2 = Model.TopTrailerSection[0].Rate; 
+									double stars2 = rate2 / 2; 
 									int fullStars2 = (int)stars2;
 									bool hasHalfStar2 = (stars2 - fullStars2) >= 0.5;
 									int emptyStars2 = 5 - fullStars2 - (hasHalfStar2 ? 1 : 0);
@@ -580,74 +541,60 @@
 		</div>
 		<hr />
 	</div>
+
 	<div class="news-slide-area">
 		<div class="news-slider">
-			<div class="single-news">
-				<div class="news-bg-1"></div>
-				<div class="news-date">
-					<h2><span>NOV</span> 25</h2>
-					<h1>2017</h1>
+			@foreach (var movie in Model.CommingSoon)
+			{
+				<div class="single-news">
+					@foreach (var img in movie.Images)
+					{
+						@if (img.Type == "video_image")
+						{
+
+							<div class="news-bg-1" style="background: url('../img/video/@img.Name') no-repeat center / cover;"></div>
+						}
+
+					}
+					<div class="news-date">
+						<h2><span>@movie.ReleaseDate.ToString("MMM")</span> @movie.ReleaseDate.Day</h2>
+						<h1>@movie.ReleaseDate.Year</h1>
+					</div>
+					<div class="news-content">
+						<h2>@movie.Title</h2>
+						<p>@movie.Overview.Substring(0, 200)...</p>
+					</div>
+					<a href="#">Read More</a>
 				</div>
-				<div class="news-content">
-					<h2>The Witch Queen</h2>
-					<p>Witch Queen is a tall woman with a slim build. She has pink hair, which is pulled up under her hat, and teal eyes.</p>
-				</div>
-				<a href="#">Read More</a>
-			</div>
-			<div class="single-news">
-				<div class="news-bg-2"></div>
-				<div class="news-date">
-					<h2><span>NOV</span> 25</h2>
-					<h1>2017</h1>
-				</div>
-				<div class="news-content">
-					<h2>The Witch Queen</h2>
-					<p>Witch Queen is a tall woman with a slim build. She has pink hair, which is pulled up under her hat, and teal eyes.</p>
-				</div>
-				<a href="#">Read More</a>
-			</div>
-			<div class="single-news">
-				<div class="news-bg-3"></div>
-				<div class="news-date">
-					<h2><span>NOV</span> 25</h2>
-					<h1>2017</h1>
-				</div>
-				<div class="news-content">
-					<h2>The Witch Queen</h2>
-					<p>Witch Queen is a tall woman with a slim build. She has pink hair, which is pulled up under her hat, and teal eyes.</p>
-				</div>
-				<a href="#">Read More</a>
-			</div>
+			}
 		</div>
+
+
 		<div class="news-thumb">
-			<div class="news-next">
-				<div class="single-news">
-					<div class="news-bg-3"></div>
-					<div class="news-date">
-						<h2><span>NOV</span> 25</h2>
-						<h1>2017</h1>
+			@for (int i = 0; i < 2; i++)
+			{
+				var cssClass = i == 0 ? "news-next" : "news-prev";
+				<div class="@cssClass">
+					<div class="single-news">
+						@foreach (var img in Model.CommingSoon[i].Images)
+						{
+							if (img.Type == "video_image")
+							{
+								<div class="news-bg-1" style="background: url('../img/video/@img.Name') no-repeat center / cover"></div>
+							}
+						}
+						<div class="news-date">
+							<h2><span>@Model.CommingSoon[i].ReleaseDate.ToString("MMM")</span> @Model.CommingSoon[i].ReleaseDate.Day</h2>
+							<h1>@Model.CommingSoon[i].ReleaseDate.Year</h1>
+						</div>
+						<div class="news-content">
+							<h2>@Model.CommingSoon[i].Title</h2>
+							<p>@(Model.CommingSoon[i].Overview.Length > 200 ? Model.CommingSoon[i].Overview.Substring(0, 200) + "..." : Model.CommingSoon[i].Overview)</p>
+						</div>
+						<a href="#">Read More</a>
 					</div>
-					<div class="news-content">
-						<h2>The Witch Queen</h2>
-						<p>Witch Queen is a tall woman with a slim build. She has pink hair, which is pulled up under her hat, and teal eyes.</p>
-					</div>
-					<a href="#">Read More</a>
 				</div>
-			</div>
-			<div class="news-prev">
-				<div class="single-news">
-					<div class="news-bg-2"></div>
-					<div class="news-date">
-						<h2><span>NOV</span> 25</h2>
-						<h1>2017</h1>
-					</div>
-					<div class="news-content">
-						<h2>The Witch Queen</h2>
-						<p>Witch Queen is a tall woman with a slim build. She has pink hair, which is pulled up under her hat, and teal eyes.</p>
-					</div>
-					<a href="#">Read More</a>
-				</div>
+			}
 			</div>
 		</div>
-	</div>
 </section><!-- news section end -->

@@ -82,11 +82,64 @@ namespace Cinema.Controllers
 
 
 
-        public IActionResult MovieDetails()
+        public IActionResult MovieDetails(int id)
         {
-            return View();
+            var movie = _dbcontext.Movies
+             .Include(e => e.Images)
+             .Include(e => e.Genres)
+             .Include(e => e.Actors)
+             .Include(e => e.Director)
+             .Include(e => e.MovieTheaters)
+                 .ThenInclude(mt => mt.Theater)
+             .FirstOrDefault(e => e.Id == id);
+
+            if (movie == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Get the current movie's genre IDs
+            var movieGenreIds = movie.Genres.Select(g => g.Id).ToList();
+
+            // Get similar movies based on at least 2 matching genres, and exclude the original movie
+            var similarMovies = _dbcontext.Movies
+                .Where(m => m.Id != id)
+                .Include(m => m.Genres)
+                .Include(m => m.Images)
+                .AsEnumerable() // Move to memory to do genre matching
+                .Where(m => m.Genres.Select(g => g.Id).Intersect(movieGenreIds).Count() >= 2);
+
+            var movieWithSimilarMovies = new MovieWithSimilarMovies
+            {
+                Movie = movie,
+                SimilarMovies = similarMovies.ToList(),
+            };
+
+
+            return View(movieWithSimilarMovies);
         }
 
+
+
+        public IActionResult ActorDetails(int id)
+        {
+            var actor = _dbcontext.Actors
+                .Include(e => e.Movies)
+                .FirstOrDefault(e => e.Id == id);
+
+            var actorMovies = _dbcontext.Movies
+                .Include(e => e.Images)
+                .Where(m => m.Actors.Any(a => a.Id == id));
+                
+
+            var ActorWithMovies = new ActorWithMovies
+            {
+                Actor = actor,
+                ActorMovies = actorMovies.ToList()
+            };
+
+            return View(ActorWithMovies);
+        }
 
 
 

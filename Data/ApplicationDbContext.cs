@@ -15,6 +15,7 @@ namespace Cinema.Data
         public DbSet<Series> Series { get; set; }
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Theater> Theaters { get; set; }
+        public DbSet<MovieTheater> MovieTheaters { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
@@ -59,6 +60,19 @@ namespace Cinema.Data
             .HasMany(e => e.Series)
             .WithOne(e => e.Director);
 
+
+            modelBuilder.Entity<MovieTheater>()
+             .HasKey(mt => new { mt.MovieId, mt.TheaterId }); // Composite Primary Key
+
+            modelBuilder.Entity<MovieTheater>()
+            .HasOne(mt => mt.Movie)
+            .WithMany(m => m.MovieTheaters)
+            .HasForeignKey(mt => mt.MovieId);
+
+            modelBuilder.Entity<MovieTheater>()
+            .HasOne(mt => mt.Theater)
+            .WithMany(t => t.MovieTheaters)
+            .HasForeignKey(mt => mt.TheaterId);
         }
 
 

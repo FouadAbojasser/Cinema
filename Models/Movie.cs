@@ -20,7 +20,7 @@ namespace Cinema.Models
         public ICollection<Actor> Actors { get; set; } = [];
         public int DirectorId { get; set; } 
         public Director Director { get; set; } = null!;
-        public ICollection<Theater> Theaters { get; set; } = [];
+        public ICollection<MovieTheater> MovieTheaters { get; set; } = [];
     }
 
 }

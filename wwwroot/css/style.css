@@ -656,15 +656,15 @@ hr {
     right: 420px;
 }
 .news-bg-1 {
-	background: url('../img/news/news1.jpg') no-repeat center / cover;
+/*	background: url('../img/news/news1.jpg') no-repeat center / cover;*/
     height: 350px;
 }
 .news-bg-2 {
-	background: url('../img/news/news2.jpg') no-repeat center / cover;
+/*	background: url('../img/news/news2.jpg') no-repeat center / cover;*/
     height: 350px;
 }
 .news-bg-3 {
-	background: url('../img/news/news3.jpg') no-repeat center / cover;
+/*	background: url('../img/news/news3.jpg') no-repeat center / cover;*/
     height: 350px;
 }
 .news-date {
@@ -1295,3 +1295,10 @@ hr {
 /*--------------------------------------
 --------- Pre Loader Style END ---------
 ---------------------------------------*/
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
