@@ -1,17 +1,18 @@
 ﻿@using Cinema.Models.ViewModels
-@model MovieWithSimilarMovies
+@model ActorWithMovies
 <!-- breadcrumb area start -->
 <section class="breadcrumb-area">
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-12">
 				<div class="breadcrumb-area-content">
-					<h1>Movie Detalied: @Model.Movie.Title</h1>
+					@* <h1>Movie Detalied: @Model.Title</h1> *@
 				</div>
 			</div>
 		</div>
 	</div>
 </section><!-- breadcrumb area end -->
+
 <!-- transformers area start -->
 <section class="transformers-area">
 	<div class="container">
@@ -19,74 +20,53 @@
 			<div class="row flexbox-center">
 				<div class="col-lg-5 text-lg-left text-center">
 					<div class="transformers-content">
-						@foreach (var img in @Model.Movie.Images)
-						{
-							if (img.Type == "slider")
-							{
-								<img src="~/img/sliders/@img.Name" alt="@img.Name" />
-							}
-						}
-
+						<img src="~/img/cast/poster/@Model.Actor.Img" alt="@Model.Actor.Img" />
 					</div>
 				</div>
 				<div class="col-lg-7">
-					<div class="transformers-content">
-						<h2>@Model.Movie.Title</h2>
-						<p>@string.Join("  |  ", @Model.Movie.Genres.Select(g => g.Title))</p>
+					<div class="transformers-content mtr-30">
+						<h2>@Model.Actor.Name</h2>
+						<a href="#" class="theme-btn">Biography</a>
+						<a href="#">Filmography</a>
 						<ul>
 							<li>
 								<div class="transformers-left">
-									Movie:
+									Height:
 								</div>
 								<div class="transformers-right">
-									<a href="#">@Model.Movie.Genres.FirstOrDefault()?.Title</a>
+									5.7”
 								</div>
 							</li>
 							<li>
 								<div class="transformers-left">
-									Writer:
+									Weight:
 								</div>
 								<div class="transformers-right">
-									@(Model.Movie.Director.Name)
+									1136LB
 								</div>
 							</li>
 							<li>
 								<div class="transformers-left">
-									Director:
+									Eye Color:
 								</div>
 								<div class="transformers-right">
-									@(Model.Movie.Director.Name)
+									Black
 								</div>
 							</li>
 							<li>
 								<div class="transformers-left">
-									Cast:
+									Hair Color: 
 								</div>
-								<div class="transformers-right d-flex">
-									@foreach (var actor in @Model.Movie.Actors)
-									{
-										<div class="single-slide-cast mx-2">
-											<a href="/Home/ActorDetails/@actor.Id">
-											<img src="~/img/cast/avatar/@actor.Img" alt="@actor.Img" class:="avatar" />
-											</a>
-										</div>
-									}
+								<div class="transformers-right">
+									Black
 								</div>
 							</li>
 							<li>
 								<div class="transformers-left">
-									Duration:
+									Birthday:
 								</div>
 								<div class="transformers-right">
-									@(@Model.Movie.Duration)
-								</div>
-							</li>
-							<li>
-								<div class="transformers-left">
-									Release:
-								</div>
-								<div class="transformers-right">
-									@(@Model.Movie.ReleaseDate.ToString("dd-MMM-yyyy"))
+									1985.Jun.20
 								</div>
 							</li>
 							<li>
@@ -94,55 +74,36 @@
 									Language:
 								</div>
 								<div class="transformers-right">
-									@(@Model.Movie.Country)
+									English, Russian
 								</div>
 							</li>
 							<li>
 								<div class="transformers-left">
-									Cinema:
+									Hobby:
 								</div>
 								<div class="transformers-right">
-									@string.Join("  |  ", Model.Movie.MovieTheaters.Select(g => g.Theater.Name))
+									Base Ball, Gaming, Exploring, Baook Reading
 								</div>
-
 							</li>
 							<li>
 								<div class="transformers-left">
-									Start Date:
+									Follow:
 								</div>
 								<div class="transformers-right">
-									@string.Join("  |  ", Model.Movie.MovieTheaters.Select(g => g.StartDate))
-								</div>
-
-							</li>
-							<li>
-								<div class="transformers-left">
-									End Date:
-								</div>
-								<div class="transformers-right">
-									@string.Join("  |  ", Model.Movie.MovieTheaters.Select(g => g.EndDate))
-								</div>
-
-							</li>
-							<li>
-								<div class="transformers-left mt-4">
-									Share:
-								</div>
-								<div class="transformers-right mt-4">
-									<a href="#"><i class="icofont icofont-social-facebook mx-1"></i></a>
-									<a href="#"><i class="icofont icofont-social-twitter mx-1"></i></a>
-									<a href="#"><i class="icofont icofont-social-google-plus mx-1"></i></a>
-									<a href="#"><i class="icofont icofont-youtube-play mx-1"></i></a>
+									<a href="#"><i class="icofont icofont-social-facebook"></i></a>
+									<a href="#"><i class="icofont icofont-social-twitter"></i></a>
+									<a href="#"><i class="icofont icofont-social-google-plus"></i></a>
+									<a href="#"><i class="icofont icofont-youtube-play"></i></a>
 								</div>
 							</li>
 						</ul>
 					</div>
 				</div>
 			</div>
-			<a href="#" class="theme-btn"><i class="icofont icofont-ticket"></i> BUY TICKET</a>
 		</div>
 	</div>
 </section><!-- transformers area end -->
+
 <!-- details area start -->
 <section class="details-area">
 	<div class="container">
@@ -150,7 +111,7 @@
 			<div class="col-lg-12">
 				<div class="details-content" style="border-bottom: none">
 					<div class="details-overview">
-						<h2>Overview</h2>
+						<h2>Actor Details</h2>
 						<p>Humans are at war with the Transformers, and Optimus Prime is gone. The key to saving the future lies buried in the secrets of the past and the hidden history of Transformers on Earth. Now it's up to the unlikely alliance of inventor Cade Yeager, Bumblebee, a n English lord and an Oxford professor to save the world. Transformers: The Last Knight has a deeper mythos and bigger spectacle than its predecessors, yet still ends up being mostly hollow and cacophonous. The first "Transformers" movie that could actually be characterized as badass. Which isn't a bad thing. It may, in fact, be better.</p>
 					</div>
 				</div>
@@ -160,16 +121,16 @@
 </section>
 <!-- details area end -->
 
-<!-- Similer Movies area start -->
+<!-- Actor Movies area start -->
 <section class="details-area">
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-12">
 				<div class="details-overview">
-					<h2>Similer Movies</h2>
+					<h2>Actor Movies</h2>
 
 					<div class="row">
-						@foreach (var movie in Model.SimilarMovies)
+						@foreach (var movie in Model.ActorMovies)
 						{
 							<div class="col-md-4 col-sm-6 mb-4">
 								<div class="single-portfolio">
@@ -185,12 +146,14 @@
 											<i class="icofont icofont-ui-play"></i>
 										</a>
 									</div>
+
 									<div class="portfolio-content text-center mt-3">
 										<h5>
-											<a href="/Home/MovieDetails/@movie.Id" class="text-white">
+											<a href="/Guest/Home/MovieDetails/@movie.Id" class="text-white">
 												@movie.Title
 											</a>
 										</h5>
+
 										<div class="d-flex justify-content-center align-items-center mt-2">
 											<div class="author-review mx-2">
 												@{
@@ -217,16 +180,16 @@
 												}
 											</div>
 											<h6 class="m-0">@movie.Rate</h6>
-										
 										</div>
 									</div>
 								</div>
 							</div>
 						}
 					</div>
+
 				</div>
 			</div>
 		</div>
 	</div>
 </section>
-<!-- Similer Movies area end -->
+<!-- Actor Movies area end -->

@@ -22,7 +22,7 @@
 					<div class="col-lg-6 col-md-7">
 						<div class="hero-area-content pr-50">
 							<h2>
-								<a href="/Home/MovieDetails/@item.Id" class="text-white">
+								<a href="/Guest/Home/MovieDetails/@item.Id" class="text-white">
 									@item.Title
 								</a>
 							</h2>
@@ -61,7 +61,7 @@
 								@foreach (var actor in item.Actors)
 								{
 									<div class="single-slide-cast mx-2">
-										<a href="/Home/ActorDetails/@actor.Id">
+										<a href="/Guest/Home/ActorDetails/@actor.Id">
 											<img src="~/img/cast/avatar/@actor.Img" alt="@actor.Img" />
 										</a>
 									</div>
@@ -152,8 +152,6 @@
 			}
 		</div>
 		<!--End of Right and Left Sides of Slider -->
-
-
 	</div>
 </section><!-- hero area end -->
 
@@ -203,7 +201,7 @@
 								</div>
 								<div class="portfolio-content text-center">
 									<h2 class="mb-1">
-										<a href="/Home/MovieDetails/@movie.Id" class="text-white">
+										<a href="/Guest/Home/MovieDetails/@movie.Id" class="text-white">
 											@movie.Title
 										</a>
 									</h2>
@@ -259,7 +257,7 @@
 								</div>
 								<div class="portfolio-content text-center">
 									<h2 class="mb-1">
-										<a href="/Home/MovieDetails/@movie.Id" class="text-white">
+										<a href="/Guest/Home/MovieDetails/@movie.Id" class="text-white">
 											@movie.Title
 										</a>
 									</h2>
@@ -314,7 +312,7 @@
 								</div>
 								<div class="portfolio-content text-center">
 									<h2 class="mb-1">
-										<a href="/Home/MovieDetails/@movie.Id" class="text-white">
+										<a href="/Guest/Home/MovieDetails/@movie.Id" class="text-white">
 											@movie.Title
 										</a>
 									</h2>
@@ -349,6 +347,7 @@
 							</div>
 						</div>
 					}
+					
 					@foreach (var movie in Model.RecentlyReleased)
 					{
 						<div class="col-md-4 col-sm-6 released">
@@ -368,7 +367,7 @@
 								</div>
 								<div class="portfolio-content text-center">
 									<h2 class="mb-1">
-										<a href="/Home/MovieDetails/@movie.Id" class="text-white">
+										<a href="/Guest/Home/MovieDetails/@movie.Id" class="text-white">
 											@movie.Title
 										</a>
 									</h2>
@@ -404,6 +403,7 @@
 							</div>
 						</div>
 					}
+
 
 				</div>
 			</div>

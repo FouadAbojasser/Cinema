@@ -54,11 +54,15 @@
 					<div class="responsive-menu"></div>
 					<div class="mainmenu">
 						<ul id="primary-menu">
-							<li><a class="active" href="/">Home</a></li>
-							<li><a href="#">Movies</a></li>
-							<li><a href="#">TV Series</a></li>
-							<li><a href="#">Actors List</a></li>
-							<li><a href="#">News</a></li>
+							@{
+								var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+								var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+							}
+							<li><a class="@(currentController == "Home" && currentAction == "Index" ? "active" : "")" href="/">Home</a></li>
+							<li><a class="@(currentController == "Home" && currentAction == "Movies" ? "active" : "")" href="/Guest/Home/Movies">Movies</a></li>
+							<li><a class="@(currentAction == "TVSeries" ? "active" : "")" href="/Home/TVSeries">TV Series</a></li>
+							<li><a class="@(currentAction == "Actors" ? "active" : "")" href="/Home/Actors">Actors List</a></li>
+							<li><a class="" href="#">Admin</a></li>
 							<li>
 								<a href="#">Pages <i class="icofont icofont-simple-down"></i></a>
 								<ul>
