@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cinema.Areas.Guest.Controllers;
-
+[Area("Guest")]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;

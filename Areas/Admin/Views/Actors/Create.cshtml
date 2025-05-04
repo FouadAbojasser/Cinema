@@ -1,0 +1,47 @@
+﻿@model Actor
+<div class="col-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Add New Actor</h4>
+      
+            <form class="forms-sample" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="Name">Name</label>
+                    <input type="text" class="form-control" asp-for="@Model.Name" placeholder="Name">
+                </div>
+
+                <div class="form-group">
+                    <label for="DoB">Date of Birth</label>
+                    <input type="date" class="form-control" asp-for="@Model.DoB" placeholder="Date of Birth">
+                </div>
+
+                <div class="form-group">
+                    <label for="Gender">Gender</label>
+                    <select class="form-control" asp-for="@Model.Gender">
+                        <option>Male</option>
+                        <option>Female</option>
+                    </select>
+                </div>
+
+
+                <div class="form-group">
+                    <label>File upload</label>
+                    <input type="file" name="img[]" class="file-upload-default">
+                    <div class="input-group col-xs-12">
+                    <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image">
+                    <span class="input-group-append">
+                        <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
+                    </span>
+                    </div>
+                </div>
+
+            
+                <a href="#" type="submit" class="btn btn-primary mr-2">Submit</a>
+
+                <a href="/Admin/Actors" class="btn btn-light">Cancel</a>
+
+            </form>
+        </div>
+    </div>
+</div>
+
