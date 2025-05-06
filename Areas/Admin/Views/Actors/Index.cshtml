@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<Actor>
+
 <div class="row">
 	<div class="col-md-12">
 		<div class="card">
@@ -36,7 +37,7 @@
 											<i class="typcn typcn-edit btn-icon-append"></i>
 										</a>
 
-										<a href="/Admin/Actors/Delete/@actor.Id" class="btn btn-danger btn-sm btn-icon-text">
+										<a href="javascript:void(0);" onclick="confirmDelete(@actor.Id)" class="btn btn-danger btn-sm btn-icon-text">
 											Delete
 											<i class="typcn typcn-delete-outline btn-icon-append"></i>
 										</a>
@@ -57,7 +58,49 @@
 
 <!-- partial:partials/_settings-panel.html -->
 <a id="settings-trigger" href="/Admin/Actors/Create">
-  <i class="typcn typcn-cog-outline"></i>
+	<h5 style="color: aliceblue; vertical-align:central; margin:0px">+</h5>
 </a>
 
+<script>
+	function confirmDelete(id) {
+		Swal.fire({
+			title: "Are you sure you want to delete this Actor?",
+			text: "You won't be able to revert this!",
+			icon: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#3085d6",
+			cancelButtonColor: "#d33",
+			confirmButtonText: "Yes, delete it!"
+		}).then((result) => {
+			if (result.isConfirmed) {
+				// Optional: show a follow-up confirmation
+				Swal.fire({
+					title: "Deleted!",
+					text: "Selected Actor has been deleted.",
+					icon: "success",
+					timer: 1500,
+					showConfirmButton: false
+				});
 
+				// Redirect to delete action
+				setTimeout(() => {
+					window.location.href = `/Admin/Actors/Delete/${id}`;
+				}, 1500); // Wait for the alert to finish
+			}
+		});
+	}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+	if (localStorage.getItem("showSuccessAlert") === "true") {
+		Swal.fire({
+			position: "center",
+			icon: "success",
+			title: "Added successfully",
+			showConfirmButton: false,
+			timer: 1500
+		});
+
+		localStorage.removeItem("showSuccessAlert");
+	}
+</script>
