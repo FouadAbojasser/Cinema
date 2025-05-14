@@ -72,7 +72,10 @@
 										Watch Trailer
 									</a>
 								</h3>
-								<a class="theme-btn theme-btn2" href="#"><i class="icofont icofont-play"></i> Tickets</a>
+								@if (User is not null && User!.Identity.IsAuthenticated)
+								{
+									<a class="theme-btn theme-btn2" href="#"><i class="icofont icofont-play"></i> Tickets</a>
+								}
 							</div>
 
 						</div>
@@ -638,7 +641,7 @@
 				icon: "success",
 				title: "@TempData["Notification"]",
 				showConfirmButton: false,
-				timer: 3000,
+				timer: 2000,
 				background: "#1e1e1e", // dark background
 				color: "#ffffff", // white text
 				iconColor: "#00ff00" // optional: change icon color for dark mode
