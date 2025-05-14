@@ -1,0 +1,283 @@
+﻿@using Cinema.Models.ViewModels
+@model MovieWithSimilarMoviesVM
+<!-- breadcrumb area start -->
+<section class="breadcrumb-area">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="breadcrumb-area-content">
+					<h1>Movie Detailes: @Model.Movie!.Title</h1>
+				</div>
+			</div>
+		</div>
+	</div>
+</section><!-- breadcrumb area end -->
+<!-- transformers area start -->
+<section class="transformers-area">
+	<div class="container">
+		<div class="transformers-box">
+			<div class="row flexbox-center">
+				<div class="col-lg-5 text-lg-left text-center">
+					<div class="transformers-content">
+						@foreach (var img in @Model.Movie.Images)
+						{
+							if (img.Type == "poster")
+							{
+								<img src="~/img/posters/@img.Name" alt="@img.Name" />
+							}
+						}
+					</div>
+				</div>
+				<div class="col-lg-7">
+					<div class="transformers-content">
+						<h2>@Model.Movie.Title</h2>
+						<p>@string.Join("  |  ", @Model.Movie.Genres.Select(g => g.Title))</p>
+						<ul>
+							<li>
+								<div class="transformers-left">
+									Movie:
+								</div>
+								<div class="transformers-right">
+									<a href="#">@Model.Movie.Genres.FirstOrDefault()?.Title</a>
+								</div>
+							</li>
+							<li>
+								<div class="transformers-left">
+									Writer:
+								</div>
+								<div class="transformers-right">
+									@(Model.Movie.Director.Name)
+								</div>
+							</li>
+							<li>
+								<div class="transformers-left">
+									Director:
+								</div>
+								<div class="transformers-right">
+									@(Model.Movie.Director.Name)
+								</div>
+							</li>
+							<li>
+								<div class="transformers-left">
+									Cast:
+								</div>
+								<div class="transformers-right d-flex">
+									@foreach (var actor in @Model.Movie.Actors)
+									{
+										<div class="single-slide-cast mx-2">
+											<a href="/Guest/Home/ActorDetails/@actor.Id">
+												<img src="~/img/cast/avatar/@actor.Img" alt="@actor.Img" class:="avatar" />
+											</a>
+										</div>
+									}
+								</div>
+							</li>
+							<li>
+								<div class="transformers-left">
+									Duration:
+								</div>
+								<div class="transformers-right">
+									@(@Model.Movie.Duration)
+								</div>
+							</li>
+							<li>
+								<div class="transformers-left">
+									Release:
+								</div>
+								<div class="transformers-right">
+									@(@Model.Movie.ReleaseDate?.ToString("dd-MMM-yyyy"))
+								</div>
+							</li>
+							<li>
+								<div class="transformers-left">
+									Language:
+								</div>
+								<div class="transformers-right">
+									@(@Model.Movie.Country)
+								</div>
+							</li>
+							<li>
+								<div class="transformers-left">
+									Cinema:
+								</div>
+								<div class="transformers-right">
+									@string.Join("  |  ", Model.Movie.MovieTheaters.Select(g => g.Theater?.Name))
+								</div>
+							</li>
+							<li>
+								<div class="transformers-left">
+									Start Date:
+								</div>
+								<div class="transformers-right">
+									@string.Join("  |  ", Model.Movie.MovieTheaters.Select(g => g.StartDate))
+								</div>
+							</li>
+							<li>
+								<div class="transformers-left">
+									End Date:
+								</div>
+								<div class="transformers-right">
+									@string.Join("  |  ", Model.Movie.MovieTheaters.Select(g => g.EndDate))
+								</div>
+							</li>
+							<li>
+								<div class="transformers-left mt-4">
+									Share:
+								</div>
+								<div class="transformers-right mt-4">
+									<a href="#"><i class="icofont icofont-social-facebook mx-1"></i></a>
+									<a href="#"><i class="icofont icofont-social-twitter mx-1"></i></a>
+									<a href="#"><i class="icofont icofont-social-google-plus mx-1"></i></a>
+									<a href="#"><i class="icofont icofont-youtube-play mx-1"></i></a>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<a href="#" class="theme-btn"><i class="icofont icofont-ticket"></i> BUY TICKET</a>
+		</div>
+	</div>
+</section><!-- transformers area end -->
+<!-- details area start -->
+<section class="details-area">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="details-content" style="border-bottom: none">
+					<div class="details-overview">
+						<h2>Overview</h2>
+						<p>@Model.Movie.Overview</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- details area end -->
+
+<!-- Movie Images slider section start -->
+<section class="details-area">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="details-overview" style="border-bottom: none">
+					<div class="details-overview">
+						<h2>Movie Gallery</h2>
+					</div>
+					<div id="movieImagesCarousel" class="carousel slide mt-30" data-ride="carousel">
+						<!-- Indicators -->
+						<ol class="carousel-indicators">
+							@for (int i = 0; i < Model.Movie.Images.Count(img => img.Type == "slider"); i++)
+							{
+								<li data-target="#movieImagesCarousel" data-slide-to="@i" class="@(i == 0 ? "active" : "")"></li>
+							}
+						</ol>
+
+						<!-- Slides -->
+						<div class="carousel-inner">
+							@{
+								var sliderImages = Model.Movie.Images.Where(img => img.Type == "slider").ToList();
+							}
+							@for (int i = 0; i < sliderImages.Count; i++)
+							{
+								<div class="carousel-item @(i == 0 ? "active" : "")">
+									<img src="~/img/sliders/@sliderImages[i].Name" class="d-block w-100" alt="@sliderImages[i].Name" style="height: 500px; object-fit: cover;">
+								</div>
+							}
+						</div>
+
+						<!-- Controls -->
+						<a class="carousel-control-prev" href="#movieImagesCarousel" role="button" data-slide="prev">
+							<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+							<span class="sr-only">Previous</span>
+						</a>
+						<a class="carousel-control-next" href="#movieImagesCarousel" role="button" data-slide="next">
+							<span class="carousel-control-next-icon" aria-hidden="true"></span>
+							<span class="sr-only">Next</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- Movie Images slider section end -->
+
+<!-- Similer Movies area start -->
+<section class="details-area">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="details-overview mt-30">
+					<h2 >Similer Movies</h2>
+					<div class="row">
+						@foreach (var movie in Model.SimilarMovies)
+						{
+							<div class="col-md-4 col-sm-6 mb-4">
+								<div class="single-portfolio">
+									<div class="single-portfolio-img position-relative">
+										@{
+											var posterImage = movie.Images.FirstOrDefault(img => img.Type == "poster");
+										}
+										@if (posterImage != null)
+										{
+
+											<img src="~/img/posters/@posterImage.Name" alt="Poster Image" class="img-fluid rounded" />
+										}
+										<a href="@movie.Trailer" class="popup-youtube">
+											<i class="icofont icofont-ui-play"></i>
+										</a>
+									</div>
+									<div class="portfolio-content text-center mt-3">
+										<h5>
+											<a href="/Guest/Home/MovieDetails/@movie.Id" class="text-white">
+												@movie.Title
+											</a>
+										</h5>
+										<div class="d-flex justify-content-center align-items-center mt-2">
+											<div class="author-review mx-2">
+												@{
+													double rate = movie.Rate;
+													double stars = rate / 2;
+													int fullStars = (int)stars;
+													bool hasHalfStar = (stars - fullStars) >= 0.5;
+													int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+												}
+
+												@for (int i = 0; i < fullStars; i++)
+												{
+													<i class="icofont icofont-star" style="color: gold;"></i>
+												}
+
+												@if (hasHalfStar)
+												{
+													<i class="icofont icofont-star" style="background: linear-gradient(90deg, gold 50%, gray 50%); -webkit-background-clip: text; color: transparent;"></i>
+												}
+
+												@for (int i = 0; i < emptyStars; i++)
+												{
+													<i class="icofont icofont-star" style="color: gray;"></i>
+												}
+											</div>
+											<h6 class="m-0">@movie.Rate</h6>
+										</div>
+									</div>
+								</div>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- Similer Movies area end -->
+@section Scripts {
+	<script>
+		// Initialize carousel
+		$(document).ready(function(){
+			$('.carousel').carousel();
+		});
+	</script>
+}

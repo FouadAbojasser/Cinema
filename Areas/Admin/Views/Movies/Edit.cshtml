@@ -1,0 +1,631 @@
+﻿
+@using Cinema.Models.ViewModels
+@model MovieGenresActorsDirectorsVM
+
+<style>
+    .circle-select {
+    flex: 0 0 auto;
+    width: 80px;
+    cursor: pointer;
+    text-align: center;
+    }
+
+    .circle-select img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 5px solid transparent;
+    transition: border 0.3s;
+    }
+
+    .circle-select.selected img {
+    border-color: #007bff; /* Common highlight for both */
+    }
+
+    .circle-select small {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    }
+</style>
+
+
+<div class="col-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Add New Movie</h4>
+
+            <form id="myForm" class="forms-sample" method="post" 
+            enctype="multipart/form-data" action="@Url.Action("Edit", "Movies")">
+
+                <!-- ID -->
+                <input type="hidden" asp-for="@Model.movie.Id" />
+
+
+                <!-- Title -->
+                <div class="form-group">
+                    <label for="Title">Title</label>
+                    <input type="text" class="form-control" asp-for="@Model.movie.Title" placeholder="Title">
+                    <span asp-validation-for="@Model.movie.Title" class="text-danger"></span>
+                </div>
+
+
+
+                <!-- Overview -->
+                <div class="form-group">
+                    <label for="Overview">Overview</label>
+                    <input type="text" class="form-control" asp-for="@Model.movie.Overview" placeholder="Overview">
+                    <span asp-validation-for="@Model.movie.Overview" class="text-danger"></span>
+                </div>
+
+
+                <!-- Trailer -->
+                <div class="form-group">
+                    <label for="Trailer">Trailer</label>
+                    <input type="url" class="form-control" asp-for="@Model.movie.Trailer" placeholder="Trailer">
+                    <span asp-validation-for="@Model.movie.Trailer" class="text-danger"></span>
+                </div>
+
+
+                <!--Production Date-->
+                <div class="form-group">
+                    <label for="@Model.movie.ProductionDate">Production Date</label>
+                    <input type="date" class="form-control" placeholder="Production Date" asp-for="@Model.movie.ProductionDate">
+                    <span asp-validation-for="@Model.movie.ProductionDate" class="text-danger"></span>
+                </div>
+
+
+
+                <!--Country-->
+                <div class="form-group">
+                    <label for="Country">Country</label>
+                    <input type="text" class="form-control" asp-for="@Model.movie.Country" placeholder="Country">
+                    <span asp-validation-for="@Model.movie.Country" class="text-danger"></span>
+                </div>
+
+
+
+                <!--Release Date-->
+                <div class="form-group">
+                    <label for="@Model.movie.ReleaseDate">Release Date</label>
+                    <input type="date" class="form-control" asp-for="@Model.movie.ReleaseDate" placeholder="Release Date">
+                    <span asp-validation-for="@Model.movie.ReleaseDate" class="text-danger"></span>
+                </div>
+
+
+
+                <!--Duration-->
+                <div class="form-group">
+                    <label for="Duration">Duration</label>
+                    <input type="text" class="form-control" asp-for="@Model.movie.Duration" placeholder="Duration">
+                    <span asp-validation-for="@Model.movie.Duration" class="text-danger"></span>
+                </div>
+
+
+
+                <!--Language-->
+                <div class="form-group">
+                    <label for="Language">Language</label>
+                    <input type="text" class="form-control" asp-for="@Model.movie.Language" placeholder="Language">
+                    <span asp-validation-for="@Model.movie.Language" class="text-danger"></span>
+                </div>
+
+
+
+                <!--Age Rating-->
+                <div class="form-group">
+                    <label for="AgeRating">Age Rating</label>
+                    <input type="number" class="form-control" asp-for="@Model.movie.AgeRating" placeholder="AgeRating">
+                    <span asp-validation-for="@Model.movie.AgeRating" class="text-danger"></span>
+                </div>
+
+
+
+                <!-- Genres -->
+                <div class="form-group">
+                    <label for="Genres">Genres</label>
+                    <div id="genre-slider" class="d-flex overflow-auto py-2" style="gap: 1rem;">
+                        @foreach (var genre in Model.Genres)
+                        {
+                          
+                            var isSelected = Model.movie.Genres.Any(g => g.Id == genre.Id);
+                            <div class="circle-select text-center @(isSelected ? "selected" : "")" data-id="@genre.Id" data-type="genre">
+                                <img src="~/img/genres/@genre.Img" alt="@genre.Title" />
+                                <small>@genre.Title</small>
+                            </div>
+                        }
+                    </div>
+                    <input type="hidden" asp-for="@Model.movie.Genres" id="SelectedGenreIds" name="SelectedGenreIds" />
+                    <span asp-validation-for="@Model.Genres" class="text-danger"></span>
+                </div>
+
+
+
+                <!-- Actors -->
+                <div class="form-group">
+                    <label for="Actors">Actors</label>
+                    <div id="actor-slider" class="d-flex overflow-auto py-2" style="gap: 1rem;">
+                        @foreach (var actor in Model.Actors)
+                        {
+                            var isSelected = Model.movie.Actors.Any(a => a.Id == actor.Id);
+                            <div class="circle-select text-center @(isSelected? "selected" : "")" data-id="@actor.Id" data-type="actor">
+                                <img src="~/img/cast/avatar/@actor.Img" alt="@actor.Name" />
+                                <small>@actor.Name</small>
+                            </div>
+                        }
+                    </div>
+                    <input type="hidden" asp-for="@Model.movie.Actors" id="SelectedActorIds" name="SelectedActorIds" />
+                    <span asp-validation-for="@Model.Actors" class="text-danger"></span>
+                </div>
+
+
+
+
+                <!-- Director -->
+                <div class="form-group">
+                    <label for="Director">Director</label>
+                    <div id="director-slider" class="d-flex overflow-auto py-2" style="gap: 1rem;">
+
+                        @foreach (var director in Model.Directors)
+                        {
+                            var isSelected = Model.movie.Director != null && Model.movie.Director.Id == director.Id;
+                            <div class="circle-select text-center @(isSelected ? "selected" : "" )" data-id="@director.Id" data-type="director">
+                                <img src="~/img/cast/avatar/@director.Img" alt="@director.Name" />
+                                <small>@director.Name</small>
+                            </div>
+                        }
+                    </div>
+
+                    <input type="hidden" asp-for="@Model.movie.Director" id="SelectedDirectorId" name="SelectedDirectorId" />
+                    <span asp-validation-for="@Model.Directors" class="text-danger"></span>
+                </div>
+
+
+                <!-- Poster Image Upload -->
+                <div class="form-group">
+                    <label>Upload Poster Image</label>
+                    <div class="input-group">
+                        <input type="file" id="posterImageInput" name="PosterImage" accept="image/*" style="display: none;" />
+                        <input type="text" class="form-control file-upload-info" placeholder="No image chosen" disabled />
+                        <span class="input-group-append">
+                            <button class="btn btn-primary" type="button" id="uploadPostBtn">Choose Image</button>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Poster Carousel Preview -->
+                <div class="form-group">
+                    <div id="posterCarouselExampleIndicators" class="carousel slide" data-ride="carousel"
+                         style="max-width: 100%; height: 300px; overflow: hidden; border-radius: 10px; background: #f8f9fa;">
+                        <ol class="carousel-indicators" id="carousel-indicators-poster"></ol>
+                        <div class="carousel-inner" id="carousel-inner-poster" style="height: 100%;"></div>
+                    </div>
+                </div>
+
+                
+
+
+                <!-- Slider Upload -->
+                <div class="form-group">
+                    <label>Upload Slider Images</label>
+                    <div class="input-group">
+                        <input type="file" id="sliderImagesInput" name="SliderImages" multiple accept="image/*" style="display: none;" />
+                        <input type="text" class="form-control file-upload-info" placeholder="No files chosen" disabled />
+                        <span class="input-group-append">
+                            <button class="btn btn-primary" type="button" id="uploadBtn">Choose Files</button>
+                        </span>
+                    </div>
+                </div>
+
+
+
+                <!-- Carousel Preview -->
+                <div class="form-group">
+                    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" 
+                        style="max-width: 100%; height: 300px; overflow: hidden; border-radius: 10px; background: #f8f9fa;">
+                        <ol class="carousel-indicators" id="carousel-indicators"></ol>
+                        <div class="carousel-inner" id="carousel-inner" style="height: 100%;"></div>
+
+                        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+
+                        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+
+                    </div>
+                </div>
+
+
+
+                <!-- Submit Buttons -->
+                <button id="submitBtn" asp-for="@Model.movie.Images" type="submit" class="btn btn-primary mr-2">Submit</button>
+                <a href="/Admin/Movies" class="btn btn-light">Cancel</a>
+
+                <div id="SelectedGenreIdsContainer"></div>
+                <div id="SelectedActorIdsContainer"></div>
+                <div id="SelectedDirectorIdContainer"></div>
+
+                <input type="hidden" name="RemovedPosterUrl" id="RemovedPosterUrl" />
+                <div id="RemovedSlidersContainer"></div> <!-- Sliders will be dynamically added here -->
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form = document.getElementById("myForm");
+            const fileInput = document.getElementById("sliderImagesInput");
+            const posterInput = document.getElementById("posterImageInput");
+            const uploadBtn = document.getElementById("uploadBtn");
+            const posterUploadBtn = document.getElementById("uploadPostBtn");
+
+            const fileInfo = document.querySelector(".file-upload-info");
+            const posterFileInfo = posterUploadBtn.closest(".input-group").querySelector(".file-upload-info");
+
+            const indicators = document.getElementById("carousel-indicators");
+            const inner = document.getElementById("carousel-inner");
+
+            const posterIndicators = document.getElementById("carousel-indicators-poster");
+            const posterInner = document.getElementById("carousel-inner-poster");
+
+            const removedPosterInput = document.getElementById("RemovedPosterUrl");
+            const removedSlidersContainer = document.getElementById("RemovedSlidersContainer");
+
+            const selectedGenreIds = new Set();
+            const selectedActorIds = new Set();
+            let selectedDirectorId = null;
+
+            initializeSelections();
+            setupSelectionHandlers();
+            setupPosterUpload();
+            setupSliderUpload();
+            loadExistingImages();
+            setupFormSubmission();
+
+            function initializeSelections() {
+        @foreach (var genre in Model.movie.Genres)
+        {
+            <text>selectedGenreIds.add("@genre.Id");</text>
+        }
+        @foreach (var actor in Model.movie.Actors)
+        {
+            <text>selectedActorIds.add("@actor.Id");</text>
+        }
+        @if (Model.movie.Director != null)
+        {
+            <text>selectedDirectorId = "@Model.movie.Director.Id";</text>
+        }
+
+                document.querySelectorAll(".circle-select").forEach(el => {
+                    const id = el.getAttribute("data-id");
+                    const type = el.getAttribute("data-type");
+
+                    if (type === "genre" && selectedGenreIds.has(id)) {
+                        el.classList.add("selected");
+                    } else if (type === "actor" && selectedActorIds.has(id)) {
+                        el.classList.add("selected");
+                    } else if (type === "director" && id === selectedDirectorId) {
+                        el.classList.add("selected");
+                    }
+                });
+            }
+
+            function setupSelectionHandlers() {
+                document.querySelectorAll(".circle-select").forEach(el => {
+                    el.addEventListener("click", function () {
+                        const id = this.getAttribute("data-id");
+                        const type = this.getAttribute("data-type");
+
+                        if (type === "genre") {
+                            toggleSelection(selectedGenreIds, id, this);
+                        } else if (type === "actor") {
+                            toggleSelection(selectedActorIds, id, this);
+                        } else if (type === "director") {
+                            document.querySelectorAll('[data-type="director"]').forEach(d => d.classList.remove("selected"));
+                            if (selectedDirectorId === id) {
+                                selectedDirectorId = null;
+                            } else {
+                                selectedDirectorId = id;
+                                this.classList.add("selected");
+                            }
+                        }
+
+                        updateHiddenFields();
+                    });
+                });
+            }
+
+            function toggleSelection(set, id, element) {
+                if (set.has(id)) {
+                    set.delete(id);
+                    element.classList.remove("selected");
+                } else {
+                    set.add(id);
+                    element.classList.add("selected");
+                }
+            }
+
+            function setupPosterUpload() {
+                posterUploadBtn.addEventListener("click", () => posterInput.click());
+
+                    posterInput.addEventListener("change", function () {
+                        const file = this.files[0];
+
+                        if (!file || !file.type.startsWith("image/")) {
+                            posterFileInfo.value = "No valid image selected";
+                            return;
+                        }
+
+                        // Check and track existing poster before clearing
+                        const existingPosterImg = posterInner.querySelector("img");
+                        if (existingPosterImg && existingPosterImg.src) {
+                            // Set the removed poster URL only if not already removed
+                            if (!removedPosterInput.value) {
+                                removedPosterInput.value = existingPosterImg.src;
+                            }
+                        }
+
+                        posterIndicators.innerHTML = "";
+                        posterInner.innerHTML = "";
+
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+
+                        posterIndicators.innerHTML = "";
+                        posterInner.innerHTML = "";
+
+                        posterFileInfo.value = file.name;
+
+                        const indicator = document.createElement("li");
+                        indicator.setAttribute("data-target", "#posterCarouselExampleIndicators");
+                        indicator.setAttribute("data-slide-to", "0");
+                        indicator.classList.add("active");
+                        posterIndicators.appendChild(indicator);
+
+                        const carouselItem = document.createElement("div");
+                        carouselItem.classList.add("carousel-item", "active");
+
+                        const img = document.createElement("img");
+                        img.classList.add("d-block", "w-100");
+                        img.src = e.target.result;
+                        img.alt = "Poster Image";
+                        img.style.height = "300px";
+                        img.style.objectFit = "contain";
+                        img.style.backgroundColor = "#f0f0f0";
+
+                        const caption = document.createElement("div");
+                        caption.classList.add("carousel-caption", "d-none", "d-md-block");
+                        caption.innerHTML = `<h5>Poster Preview</h5><p>${file.name}</p>`;
+
+                        carouselItem.appendChild(img);
+                        carouselItem.appendChild(caption);
+                        posterInner.appendChild(carouselItem);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            function setupSliderUpload() {
+                uploadBtn.addEventListener('click', () => fileInput.click());
+
+                fileInput.addEventListener('change', function () {
+                    const files = Array.from(fileInput.files);
+                    indicators.querySelectorAll('[data-is-new="true"]').forEach(i => i.remove());
+                    inner.querySelectorAll('.carousel-item[data-is-new="true"]').forEach(i => i.remove());
+
+                    fileInfo.value = files.length ? files.map(f => f.name).join(', ') : 'No files chosen';
+
+                    files.forEach((file, index) => {
+                        if (!file.type.startsWith('image/')) return;
+
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            const indicator = document.createElement('li');
+                            indicator.setAttribute('data-target', '#carouselExampleIndicators');
+                            indicator.setAttribute('data-slide-to', indicators.children.length);
+                            indicator.setAttribute('data-is-new', 'true');
+                            indicators.appendChild(indicator);
+
+                            const carouselItem = document.createElement('div');
+                            carouselItem.classList.add('carousel-item');
+                            carouselItem.setAttribute('data-is-new', 'true');
+
+                            const img = document.createElement('img');
+                            img.classList.add('d-block', 'w-100');
+                            img.src = e.target.result;
+                            img.alt = `Slide ${indicators.children.length + 1}`;
+                            img.style.height = "300px";
+                            img.style.objectFit = "contain";
+                            img.style.backgroundColor = "#f0f0f0";
+
+                            const caption = document.createElement('div');
+                            caption.classList.add('carousel-caption', 'd-none', 'd-md-block');
+                            caption.innerHTML = `<h5>New Slide ${indicators.children.length}</h5><p>${file.name}</p>`;
+
+                            carouselItem.appendChild(img);
+                            carouselItem.appendChild(caption);
+                            inner.appendChild(carouselItem);
+
+                            if (indicators.children.length === 1) {
+                                indicators.firstChild.classList.add('active');
+                                carouselItem.classList.add('active');
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                });
+            }
+
+            function loadExistingImages() {
+                const modelImages = [
+        @foreach (var image in Model.movie.Images)
+        {
+            var path = image.Type == "poster"
+                ? Url.Content("~/img/posters/" + image.Name)
+                : Url.Content("~/img/sliders/" + image.Name);
+
+            <text>{ url: "@path", name: "@image.Name", type: "@image.Type" },</text>
+        }
+                ];
+
+                modelImages.forEach((image, index) => {
+                    if (image.type === "poster") {
+                        // Poster side
+                        posterIndicators.innerHTML = "";
+                        posterInner.innerHTML = "";
+
+                        const indicator = document.createElement("li");
+                        indicator.setAttribute("data-target", "#posterCarouselExampleIndicators");
+                        indicator.setAttribute("data-slide-to", "0");
+                        indicator.classList.add("active");
+                        posterIndicators.appendChild(indicator);
+
+                        const carouselItem = document.createElement("div");
+                        carouselItem.classList.add("carousel-item", "active");
+
+                        const img = document.createElement("img");
+                        img.classList.add("d-block", "w-100");
+                        img.src = image.url;
+                        img.alt = "Existing Poster";
+                        img.style.height = "300px";
+                        img.style.objectFit = "contain";
+                        img.style.backgroundColor = "#f0f0f0";
+
+                        const caption = document.createElement("div");
+                        caption.classList.add("carousel-caption", "d-none", "d-md-block");
+                        caption.innerHTML = `
+                            <h5>Poster</h5>
+                            <p>${image.name}</p>
+                            <button class="btn btn-danger btn-sm remove-image" type="button">Remove</button>
+                        `;
+
+                        caption.querySelector(".remove-image").addEventListener("click", () => {
+                            removedPosterInput.value = image.url;
+                            carouselItem.remove();
+                            indicator.remove();
+                        });
+
+                        carouselItem.appendChild(img);
+                        carouselItem.appendChild(caption);
+                        posterInner.appendChild(carouselItem);
+                    } else {
+                        // Slider side
+                        const indicator = document.createElement("li");
+                        indicator.setAttribute("data-target", "#carouselExampleIndicators");
+                        indicator.setAttribute("data-slide-to", indicators.children.length);
+                        if (indicators.children.length === 0) indicator.classList.add("active");
+                        indicators.appendChild(indicator);
+
+                        const carouselItem = document.createElement("div");
+                        carouselItem.classList.add("carousel-item");
+                        if (indicators.children.length === 1) carouselItem.classList.add("active");
+
+                        const img = document.createElement("img");
+                        img.classList.add("d-block", "w-100");
+                        img.src = image.url;
+                        img.alt = "Existing Slide";
+                        img.style.height = "300px";
+                        img.style.objectFit = "contain";
+                        img.style.backgroundColor = "#f0f0f0";
+
+                        const caption = document.createElement("div");
+                        caption.classList.add("carousel-caption", "d-none", "d-md-block");
+                        caption.innerHTML = `
+                            <h5>Slide</h5>
+                            <p>${image.name}</p>
+                            <button class="btn btn-danger btn-sm remove-image" type="button">Remove</button>
+                        `;
+
+                        caption.querySelector(".remove-image").addEventListener("click", () => {
+                            const input = document.createElement("input");
+                            input.type = "hidden";
+                            input.name = "RemovedSlidersUrls";
+                            input.value = image.url;
+                            removedSlidersContainer.appendChild(input);
+
+                            carouselItem.remove();
+                            indicator.remove();
+                            updateCarouselIndices();
+                        });
+
+                        carouselItem.appendChild(img);
+                        carouselItem.appendChild(caption);
+                        inner.appendChild(carouselItem);
+                    }
+                });
+            }
+
+            function updateCarouselIndices() {
+                const remainingIndicators = indicators.querySelectorAll('li');
+                const remainingItems = inner.querySelectorAll('.carousel-item');
+
+                remainingIndicators.forEach((ind, i) => {
+                    ind.setAttribute('data-slide-to', i);
+                    if (i === 0) {
+                        ind.classList.add('active');
+                        remainingItems[i].classList.add('active');
+                    } else {
+                        ind.classList.remove('active');
+                        remainingItems[i].classList.remove('active');
+                    }
+                });
+            }
+
+            function updateHiddenFields() {
+                const existingHidden = form.querySelectorAll('input[type="hidden"][name^="Selected"]');
+                existingHidden.forEach(el => el.remove());
+
+                selectedGenreIds.forEach(id => {
+                    const input = createHiddenInput("SelectedGenreIds", id);
+                    form.appendChild(input);
+                });
+
+                selectedActorIds.forEach(id => {
+                    const input = createHiddenInput("SelectedActorIds", id);
+                    form.appendChild(input);
+                });
+
+                if (selectedDirectorId) {
+                    const input = createHiddenInput("SelectedDirectorId", selectedDirectorId);
+                    form.appendChild(input);
+                }
+            }
+
+            function createHiddenInput(name, value) {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = name;
+                input.value = value;
+                return input;
+            }
+
+            function setupFormSubmission() {
+                form.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    if ($(form).valid()) {
+                        updateHiddenFields();
+                        
+                        form.submit();
+                    }
+                });
+            }
+        });
+    </script>
+}
+
+
+
+

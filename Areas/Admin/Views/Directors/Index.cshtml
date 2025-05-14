@@ -1,0 +1,103 @@
+﻿@model IEnumerable<Director>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="table-responsive pt-3">
+				<table class="table table-striped project-orders-table">
+					<thead>
+						<tr>
+							<th class="ml-5">ID</th>
+							<th>Image</th>
+							<th>Director Name</th>
+							<th>Date of Birth</th>
+							<th>Gender</th>
+							<th>No of Movies</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+
+						@foreach (var director in Model)
+
+						{
+
+							<tr>
+								<td>@director.Id</td>
+								<td class="py-1">
+									<img src="~/img/cast/avatar/@director.Img" alt="image"
+										 style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;"/>
+								</td>
+								<td>@director.Name</td>
+								<td>@director.DoB.ToString("dd-MMM-yyyy")</td>
+								<td>@director.Gender</td>
+								<td>@director.NoOfMovies</td>
+								<td>
+									<div class="d-flex align-items-center">
+										<a href="/Admin/Directors/Edit/@director.Id" class="btn btn-success btn-sm btn-icon-text mr-3">
+											Edit
+											<i class="typcn typcn-edit btn-icon-append"></i>
+										</a>
+
+										<a href="javascript:void(0);" onclick="confirmDelete(@director.Id)" class="btn btn-danger btn-sm btn-icon-text">
+											Delete
+											<i class="typcn typcn-delete-outline btn-icon-append"></i>
+										</a>
+
+									</div>
+								</td>
+							</tr>
+
+						}
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Create Floating Button -->
+<a id="settings-trigger" href="/Admin/Directors/Create">
+	<h5 style="color: aliceblue; vertical-align:central; margin:0px">+</h5>
+</a>
+
+<script>
+	function confirmDelete(id) {
+		Swal.fire({
+			title: "Are you sure you want to delete this Director?",
+			text: "You won't be able to revert this!",
+			icon: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#3085d6",
+			cancelButtonColor: "#d33",
+			confirmButtonText: "Yes, delete it!"
+		}).then((result) => {
+			if (result.isConfirmed) {
+				// Optional: show a follow-up confirmation
+				
+				// Redirect to delete action
+				setTimeout(() => {
+					window.location.href = `/Admin/Directors/Delete/${id}`;
+				}, 1500); // Wait for the alert to finish
+			}
+		});
+	}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if (TempData["SuccessMessage"] != null)
+{
+	<script>
+		Swal.fire({
+			position: "center",
+			icon: "success",
+			title: "@TempData["SuccessMessage"]",
+			showConfirmButton: false,
+			timer: 1500
+		});
+	</script>
+}
+
+

@@ -1,0 +1,87 @@
+﻿@model Genre
+
+<div class="col-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Add New Genre</h4>
+
+            <form id="myForm" class="forms-sample" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="Title">Title</label>
+                    <input type="text" class="form-control" asp-for="Title" placeholder="Title">
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="Description">Description</label>
+                    <input type="text" class="form-control" asp-for="Description" placeholder="Description">
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Image Preview</label>
+                    <div class="col-sm-2">
+                        <img id="imagePreview"
+                             src=""
+                             alt="Genre Icon"
+                             class="img-thumbnail rounded-circle"
+                             style="width: 80px; height: 80px; object-fit: cover;" />
+                    </div>
+
+                    <div class="col-sm-8">
+                        <label>Image upload</label>
+                        <input type="file" asp-for="Img" class="file-upload-default" id="ImgInput" name="Img" accept="image/*">
+                        <div class="input-group col-xs-12">
+                            <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Genre Icon">
+                            <span class="input-group-append">
+                                <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
+                            </span>
+                            <span asp-validation-for="Img" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <button id="submitBtn" type="submit" class="btn btn-primary mr-2">Submit</button>
+
+                <a href="/Admin/Genres" class="btn btn-light">Cancel</a>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial">
+    }
+
+    <script>
+        const form = document.getElementById("myForm");
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault(); // Prevent immediate submit
+
+            // Check if the form is valid using jQuery Unobtrusive Validation
+            if ($(form).valid()) {
+                // Submit the form
+                form.submit();
+            }
+            // else: don't show alert or submit the form
+        });
+    </script>
+    <script>
+        document.getElementById('ImgInput').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imgPreview = document.getElementById('imagePreview');
+                    imgPreview.src = e.target.result;
+                    imgPreview.style.display = 'block'; // Make sure it shows
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+

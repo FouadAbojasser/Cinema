@@ -1,0 +1,107 @@
+﻿@using Cinema.Models.ViewModels
+@model MoviesWithGenresVM
+<!-- breadcrumb area start -->
+<section class="breadcrumb-area">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="breadcrumb-area-content">
+					<h1>Movies By Geners</h1>
+				</div>
+			</div>
+		</div>
+	</div>
+</section><!-- breadcrumb area end -->
+
+<!-- details area end -->
+<!-- Actor Movies area start -->
+<section class="details-area">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="details-overview">
+				@foreach(var genre in Model.Genres)
+				{
+						<div class="row">
+							<div class="col-lg-12">
+								<div class="section-title pb-20">
+									<h1>
+										<img src="~/img/genres/@genre.Img" alt="@genre.Title" style="width: 40px; height: 40px;">
+										@genre.Title
+									</h1>
+								</div>
+							</div>
+						</div>
+						<hr />
+
+					<div class="row">
+						@foreach(var movie in Model.Movies)
+						{
+						
+							var firstGenre = movie.Genres.FirstOrDefault();
+							if (firstGenre != null && firstGenre.Id == genre.Id)
+							{
+								<div class="col-md-4 col-sm-6 mb-4">
+									<div class="single-portfolio">
+										<div class="single-portfolio-img position-relative">
+												@{
+													var posterImage = movie.Images.FirstOrDefault(img => img.Type == "poster");
+												}
+												@if (posterImage != null)
+												{
+												
+													<img src="~/img/posters/@posterImage.Name" alt="Poster Image" class="img-fluid rounded" />
+												}
+											<a href="@movie.Trailer" class="popup-youtube">
+												<i class="icofont icofont-ui-play"></i>
+											</a>
+										</div>
+
+										<div class="portfolio-content text-center mt-3">
+											<h5>
+												<a href="/Guest/Home/MovieDetails/@movie.Id" class="text-white">
+													@movie.Title
+												</a>
+											</h5>
+
+											<div class="d-flex justify-content-center align-items-center mt-2">
+												<div class="author-review mx-2">
+													@{
+														double rate = movie.Rate;
+														double stars = rate / 2;
+														int fullStars = (int)stars;
+														bool hasHalfStar = (stars - fullStars) >= 0.5;
+														int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+													}
+
+													@for (int i = 0; i < fullStars; i++)
+													{
+														<i class="icofont icofont-star" style="color: gold;"></i>
+													}
+
+													@if (hasHalfStar)
+													{
+														<i class="icofont icofont-star" style="background: linear-gradient(90deg, gold 50%, gray 50%); -webkit-background-clip: text; color: transparent;"></i>
+													}
+
+													@for (int i = 0; i < emptyStars; i++)
+													{
+														<i class="icofont icofont-star" style="color: gray;"></i>
+													}
+												</div>
+												<h6 class="m-0">@movie.Rate</h6>
+											</div>
+										</div>
+									</div>
+								</div>
+							}
+						}
+					</div>
+				}
+
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- Actor Movies area end -->

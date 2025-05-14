@@ -1,0 +1,89 @@
+﻿@model Director
+
+<div class="col-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Edit Director</h4>
+
+            <form id="myForm" class="forms-sample" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="Name">Name</label>
+                    <input type="text" class="form-control" asp-for="Name" placeholder="Name">
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="DoB">Date of Birth</label>
+                    <input type="date" class="form-control" asp-for="DoB" placeholder="Date of Birth">
+                    <span asp-validation-for="DoB" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="Gender">Gender</label>
+                    <select class="form-control" asp-for="Gender">
+                        <option>Male</option>
+                        <option>Female</option>
+                    </select>
+                    <span asp-validation-for="Gender" class="text-danger"></span>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Current Image</label>
+                    <div class="col-sm-2">
+                        <img id="imagePreview"
+                             src="@Url.Content("~/img/cast/avatar/" + Model.Img)"
+                             alt="Director Image"
+                             class="img-thumbnail rounded-circle"
+                             style="width: 80px; height: 80px; object-fit: cover;" />
+                    </div>
+
+                    <div class="col-sm-8">
+                        <label>Image Upload</label>
+                        <input type="file" asp-for="Img" class="file-upload-default" id="ImgInput" name="Img" accept="image/*" />
+                        <div class="input-group col-xs-12">
+                            <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image">
+                            <span class="input-group-append">
+                                <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
+                            </span>
+                            <span asp-validation-for="Img" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Optional: Hidden input to preserve old image filename -->
+                <input type="hidden" name="ExistingImg" value="@Model.Img" />
+
+                <button id="submitBtn" type="submit" class="btn btn-primary mr-2">Submit</button>
+                <a href="/Admin/Directors" class="btn btn-light">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const form = document.getElementById("myForm");
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            if ($(form).valid())
+            {
+                form.submit();
+            }
+        });
+
+        document.getElementById('ImgInput').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+}
