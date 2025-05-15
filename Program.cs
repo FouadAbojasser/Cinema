@@ -3,7 +3,9 @@ using Cinema.Migrations;
 using Cinema.Models;
 using Cinema.Repositories;
 using Cinema.Repositories.IRepositories;
+using Cinema.Utility;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cinema
@@ -20,12 +22,14 @@ namespace Cinema
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            builder.Services.AddTransient<IEmailSender, EmailSender>();
+
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(option =>
             {
                 option.Password.RequiredLength = 6;  //Default Lenght
-                option.SignIn.RequireConfirmedEmail = false; //Change to true to allow only confioremd emails to login
+                option.SignIn.RequireConfirmedEmail = true; //Change to true to allow only confioremd emails to login
             
-            }).AddEntityFrameworkStores<ApplicationDbContext>();
+            }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders(); ;
 
             builder.Services.AddDbContext<ApplicationDbContext>();
 

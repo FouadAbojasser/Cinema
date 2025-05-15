@@ -648,3 +648,19 @@
 			});
 		</script>
 	}
+
+@if (TempData["ConfirmEmail"] != null)
+{
+	<script>
+		Swal.fire({
+			position: "center",
+			icon: "error",
+			iconColor: "#FF0000",
+			title: "@TempData["ConfirmEmail"]",
+			showConfirmButton: false,
+			timer: 4000,
+			background: "#1e1e1e", // dark background
+			color: "#ffffff", // white text
+		});
+	</script>
+}

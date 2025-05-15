@@ -225,12 +225,12 @@
 				</li>
 
 
+				<!-- First section: Tables -->
 				<li class="nav-item">
 					<a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
 						<i class="typcn typcn-document-text menu-icon"></i>
 						<span class="menu-title">Tables</span>
 						<i class="menu-arrow"></i>
-
 					</a>
 					<div class="collapse" id="ui-basic">
 						<ul class="nav flex-column sub-menu">
@@ -238,10 +238,28 @@
 							<li class="nav-item"> <a class="nav-link" href="/Admin/Directors">Directors</a></li>
 							<li class="nav-item"> <a class="nav-link" href="/Admin/Genres">Genres</a></li>
 							<li class="nav-item"> <a class="nav-link" href="/Admin/Movies">Movies</a></li>
-							<li class="nav-item"> <a class="nav-link" href="/Admin/Cinemas">Cinemas</a></li>
+							@* <li class="nav-item"> <a class="nav-link" href="/Admin/Cinemas">Cinemas</a></li> *@
 						</ul>
 					</div>
 				</li>
+
+				<!-- Second section: Management -->
+				<li class="nav-item">
+					<a class="nav-link" data-toggle="collapse" href="#ui-management" aria-expanded="false" aria-controls="ui-management">
+						<i class="typcn typcn-briefcase menu-icon"></i>
+						<span class="menu-title">Management</span>
+						<i class="menu-arrow"></i>
+					</a>
+					<div class="collapse" id="ui-management">
+						<ul class="nav flex-column sub-menu">
+							<li class="nav-item"> <a class="nav-link" href="/Admin/Users">Users</a></li>
+							<li class="nav-item"> <a class="nav-link" href="/Admin/Cinemas">Cinemas</a></li>
+							<li class="nav-item"> <a class="nav-link" href="/Admin/Tickets">Tickets</a></li>
+						</ul>
+					</div>
+				</li>
+
+
 
 			</ul>
 		</nav>
@@ -273,7 +291,7 @@
 	<!-- endinject -->
 
 	<!-- Plugin js for this page-->
-	@* <script src="~/vendors/chart.js/Chart.min.js"></script> *@
+	<script src="~/vendors/chart.js/Chart.min.js"></script>
 	<!-- End plugin js for this page-->
 
 	<!-- inject:js -->
@@ -293,14 +311,14 @@
 	
 	<!-- Scripts Page Loader -->
 	<script src="~/js/jquery.min.js"></script>
-	<script src="~/js/bootstrap.min.js"></script>
+	@* <script src="~/js/bootstrap.bundle.min.js"></script> *@
 	<script src="~/js/jquery.slicknav.min.js"></script>
 	<script src="~/js/owl.carousel.min.js"></script>
 	<script src="~/js/jquery.magnific-popup.min.js"></script>
 	<script src="~/js/isotope.pkgd.min.js"></script>
 	<script src="~/js/main.js"></script>
+	<script src="../../js/chart.js"></script>
 	
-
 	@await RenderSectionAsync("Scripts", required: false)
 
 

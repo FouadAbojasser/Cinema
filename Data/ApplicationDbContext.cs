@@ -22,7 +22,6 @@ namespace Cinema.Data
 
         //}
 
-
         public DbSet<Actor> Actors { get; set; }
         public DbSet<Director> Directors { get; set; }
         public DbSet<Movie> Movies { get; set; }
