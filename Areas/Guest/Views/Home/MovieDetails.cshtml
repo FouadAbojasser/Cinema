@@ -437,7 +437,7 @@
 						<div class="details-reply">
 							<h2>Leave a Comment</h2>
 
-							<form action="/Identity/User/AddReview" method="post">
+							<form action="/Identity/UserActivities/AddReview" method="post">
 								<input type="hidden" name="MovieId" value="@Model.Movie.Id" />
 								<div class="row">
 									<div class="col-lg-12">
@@ -462,11 +462,12 @@
 				<div class="blog-sidebar">
 					<h4>Recent Comments</h4>
 					<ul>
-						<li><a href="#">admin on Justice League</a></li>
-						<li><a href="#">admin on Mask Man</a></li>
-						<li><a href="#">admin on Angle Pori</a></li>
-						<li><a href="#">admin on The Man</a></li>
-						<li><a href="#">admin on WP Devil</a></li>
+						@foreach (var review in Model.Movie.Reviews.OrderByDescending(e=>e.CreatedAt).Take(5))
+						{
+
+							<li> @review.Comment</li>
+						}
+						
 					</ul>
 				</div>
 			</div>

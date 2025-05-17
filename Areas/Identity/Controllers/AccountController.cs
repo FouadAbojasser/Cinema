@@ -205,6 +205,31 @@ namespace Cinema.Areas.Identity.Controllers
 
 
 
+        public IActionResult ResetPasswordRequest()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPasswordRequestAsync(string UserNameOrEmail)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            var applicationUser = await _userManager.FindByNameAsync(UserNameOrEmail);
+
+            if (applicationUser is null)
+            {
+                applicationUser = await _userManager.FindByEmailAsync(UserNameOrEmail);
+            }
+
+           return View(applicationUser);
+
+        }
+
+
 
 
 

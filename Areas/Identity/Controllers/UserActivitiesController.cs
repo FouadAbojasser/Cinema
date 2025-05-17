@@ -12,13 +12,13 @@ using Microsoft.IdentityModel.Tokens;
 namespace Cinema.Areas.Identity.Controllers
 {
     [Area("Identity")]
-    public class UserController : Controller
+    public class UserActivitiesController : Controller
     {
         private readonly IReviewRepository _reviewRepository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMovieRepository _movieRepository;
 
-        public UserController(IReviewRepository reviewRepository, UserManager<ApplicationUser> userManager, IMovieRepository movieRepository)
+        public UserActivitiesController(IReviewRepository reviewRepository, UserManager<ApplicationUser> userManager, IMovieRepository movieRepository)
         {
             _reviewRepository = reviewRepository;
             _userManager = userManager;
