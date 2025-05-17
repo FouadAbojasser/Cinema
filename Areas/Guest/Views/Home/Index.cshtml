@@ -72,7 +72,7 @@
 										Watch Trailer
 									</a>
 								</h3>
-								@if (User is not null && User!.Identity.IsAuthenticated)
+								@if (User is not null && User!.Identity!.IsAuthenticated)
 								{
 									<a class="theme-btn theme-btn2" href="#"><i class="icofont icofont-play"></i> Tickets</a>
 								}

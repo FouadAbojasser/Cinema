@@ -29,10 +29,10 @@ namespace Cinema.Data
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Theater> Theaters { get; set; }
         public DbSet<MovieTheater> MovieTheaters { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
 
-       
-        
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

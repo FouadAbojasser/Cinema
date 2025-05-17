@@ -11,7 +11,6 @@ namespace Cinema.Areas.Guest.Controllers;
 public class HomeController : Controller
 {
 
-
     //private readonly ApplicationDbContext _dbcontext = new ();
   
     private readonly ILogger<HomeController> _logger;
@@ -22,9 +21,12 @@ public class HomeController : Controller
 
     private readonly IGenreRepository _genreRepository;
 
+    private readonly IReviewRepository _reviewRepository;
+
     public HomeController(IMovieRepository movieRepository,
                             IActorRepository actorRepository,
                             IGenreRepository genreRepository,
+                            IReviewRepository reviewRepository,
                             ILogger<HomeController> logger)
     {
    
@@ -33,6 +35,8 @@ public class HomeController : Controller
         _actorRepository = actorRepository;
 
         _genreRepository = genreRepository;
+
+        _reviewRepository = reviewRepository;
 
         _logger = logger;
     }
@@ -49,10 +53,10 @@ public class HomeController : Controller
         //    .Take(6);
 
         var Latest = _movieRepository.Get(
-            e => e.ProductionDate < today, 
+            e => e.ReleaseDate < today, 
             [e => e.Images],
             false,
-            e=>e.OrderByDescending(x=>x.ProductionDate)
+            e=>e.OrderByDescending(x=>x.ReleaseDate)
             ).Take(6);
 
 
@@ -94,7 +98,7 @@ public class HomeController : Controller
         //    .Take(6);
 
         var RecentlyReleased = _movieRepository.Get(
-            e => e.ProductionDate >= today.AddDays(-30) && e.ProductionDate <= today,
+            e => e.ReleaseDate >= today.AddDays(-60) && e.ReleaseDate <= today,
             [e => e.Images],
             false,
             e => e.OrderByDescending(e => e.ProductionDate)).Take(6);
@@ -152,7 +156,9 @@ public class HomeController : Controller
             .Include(e => e.Actors)
             .Include(e => e.Director)
             .Include(e => e.MovieTheaters)
-            .ThenInclude(mt => mt.Theater));
+            .ThenInclude(mt => mt.Theater)
+            .Include(r => r.Reviews)
+            .ThenInclude(u=>u.applicationUser));
 
         if (movie == null)
         {
@@ -180,17 +186,18 @@ public class HomeController : Controller
                 .ThenInclude(mt => mt.Theater)
 );
 
-
-        var movieWithSimilarMovies = new MovieWithSimilarMoviesVM
+        var movieWithSimilarMoviesWithReviews = new MovieWithSimilarMoviesWithReviewsVM
         {
             Movie = movie,
 
             SimilarMovies = similarMovies.ToList(),
 
+            Reviews = movie.Reviews.ToList(),
+
         };
 
 
-        return View(movieWithSimilarMovies);
+        return View(movieWithSimilarMoviesWithReviews);
     }
 
 

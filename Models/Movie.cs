@@ -25,6 +25,8 @@ namespace Cinema.Models
         public ICollection<Image> Images { get; set; } = [];
         public ICollection<Actor> Actors { get; set; } = [];
         public ICollection<MovieTheater> MovieTheaters { get; set; } = [];
+        public ICollection<Review> Reviews { get; set; } = [];
+
     }
 
 }

@@ -41,6 +41,8 @@ namespace Cinema
 
             builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 
+            builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

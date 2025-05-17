@@ -1,5 +1,91 @@
 ﻿@using Cinema.Models.ViewModels
-@model MovieWithSimilarMoviesVM
+@model MovieWithSimilarMoviesWithReviewsVM
+
+<style>
+
+	.review-header {
+	display: inline-flex;
+	align-items: center;
+	width: 100%;
+	justify-content: space-between; /* Optional: spaces them apart */
+	gap: 10px; /* Adjusts spacing between the two */
+	}
+
+	.review-header h2 {
+	margin: 0;
+	margin-bottom: 20px;
+	}
+
+	.review-header a {
+	text-decoration: none;
+	color: #333; /* Adjust color as needed */
+	font-size: 16px;
+	}
+
+	.details-thumb {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 30px;
+	}
+
+	.details-thumb-prev,
+	.details-thumb-next {
+	display: flex;
+	align-items: center; /* This vertically centers text and icon */
+	gap: 10px; /* Adjust spacing between icon and text */
+	}
+
+	.details-thumb-prev .thumb-icon,
+	.details-thumb-next .thumb-icon {
+	font-size: 24px; /* Adjust icon size as needed */
+	}
+
+	.details-thumb-prev h4,
+	.details-thumb-next h4 {
+	margin: 0; /* Remove default margin */
+	}
+
+	.details-thumb {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 30px;
+	}
+
+	.details-thumb a {
+	display: flex;
+	align-items: center;
+	text-decoration: none;
+	color: inherit; /* Keeps text color same as surrounding */
+	gap: 10px;
+	}
+
+	.details-thumb a:hover {
+	opacity: 0.8; /* Optional hover effect */
+	}
+
+	.thumb-icon i {
+	font-size: 24px;
+
+	}
+
+	.thumb-icon {
+	width: 20px;
+
+	}
+
+	.thumb-text h4 {
+	margin: 0;
+	}
+
+	.details-thumb a.disabled {
+		pointer-events: none;
+		opacity: 0.25;
+		cursor: default;
+	}
+
+
+</style>
+
 <!-- breadcrumb area start -->
 <section class="breadcrumb-area">
 	<div class="container">
@@ -135,7 +221,10 @@
 					</div>
 				</div>
 			</div>
-			<a href="#" class="theme-btn"><i class="icofont icofont-ticket"></i> BUY TICKET</a>
+			@if (User is not null & User!.Identity!.IsAuthenticated)
+			{
+				<a href="#" class="theme-btn"><i class="icofont icofont-ticket"></i> BUY TICKET</a>
+			}
 		</div>
 	</div>
 </section><!-- transformers area end -->
@@ -273,6 +362,117 @@
 	</div>
 </section>
 <!-- Similer Movies area end -->
+
+<!-- blog area start -->
+<section class="blog-details">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-9">
+				<div class="details-overview mt-30">
+
+
+
+					<div class="review-header">
+						<h2>Reviews</h2>
+						<a href="#"><i class="icofont icofont-comment"></i> @Model.Reviews?.Count Comments</a>
+					</div>
+
+					<div id="reviewContainer">
+						@for (int i = 0; i < Model.Reviews?.Count; i++)
+						{
+							var review = Model.Reviews[i];
+							<div class="review-item" data-index="@i" style="display: @(i == 0 ? "block" : "none")">
+								<div class="review-author">
+									<h6 style="color:darkcyan; margin-bottom:10px">
+										By: @review.applicationUser?.UserName &nbsp;&nbsp; at: @review.CreatedAt?.ToString("MMMM dd, yyyy")
+									</h6>
+								</div>
+
+								@* <div class="review-rating"> *@
+								@* 	Rating: @review.Rating/10 *@
+								@* </div> *@
+								<div class="review-content">
+									<p>@review.Comment</p>
+								</div>
+							</div>
+						}
+					</div>
+
+					<div class="details-thumb">
+						<a id="prevBtn" href="#" class="details-thumb-prev">
+							<div class="thumb-icon">
+								<i class="icofont icofont-simple-left"></i>
+							</div>
+							<div class="thumb-text">
+								<h4>Previous Post</h4>
+							</div>
+						</a>
+						<a id="nextBtn" href="#" class="details-thumb-next">
+							<div class="thumb-text">
+								<h4>Next Post</h4>
+							</div>
+							<div class="thumb-icon">
+								<i class="icofont icofont-simple-right"></i>
+							</div>
+						</a>
+					</div>
+
+
+		
+
+
+
+
+
+
+
+
+
+					@if (User is not null & User!.Identity!.IsAuthenticated)
+					{
+						<div class="review-header">
+							<h2></h2>
+						</div>
+						
+						<div class="details-reply">
+							<h2>Leave a Comment</h2>
+
+							<form action="/Identity/User/AddReview" method="post">
+								<input type="hidden" name="MovieId" value="@Model.Movie.Id" />
+								<div class="row">
+									<div class="col-lg-12">
+										<div class="textarea-container">
+											<textarea placeholder="Type Here Message" name="Comment"></textarea>
+											<button><i class="icofont icofont-send-mail"></i></button>
+										</div>
+									</div>
+								</div>
+								<div class="details-comment">
+									<button id="submitBtn" type="submit" class="theme-btn">Post a Comment</button>
+								</div>
+							</form>
+
+						</div>
+						
+					}
+
+				</div>
+			</div>
+			<div class="col-lg-3">
+				<div class="blog-sidebar">
+					<h4>Recent Comments</h4>
+					<ul>
+						<li><a href="#">admin on Justice League</a></li>
+						<li><a href="#">admin on Mask Man</a></li>
+						<li><a href="#">admin on Angle Pori</a></li>
+						<li><a href="#">admin on The Man</a></li>
+						<li><a href="#">admin on WP Devil</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</section><!-- blog area end -->
 @section Scripts {
 	<script>
 		// Initialize carousel
@@ -280,4 +480,43 @@
 			$('.carousel').carousel();
 		});
 	</script>
+
 }
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		let currentIndex = 0;
+		const reviews = document.querySelectorAll(".review-item");
+		const prevBtn = document.getElementById("prevBtn");
+		const nextBtn = document.getElementById("nextBtn");
+
+		function showReview(index) {
+			reviews.forEach((review, i) => {
+				review.style.display = i === index ? "block" : "none";
+			});
+
+			// Disable/Enable buttons accordingly
+			prevBtn.classList.toggle("disabled", index === 0);
+			nextBtn.classList.toggle("disabled", index === reviews.length - 1);
+		}
+
+		prevBtn.addEventListener("click", function (e) {
+			e.preventDefault();
+			if (currentIndex > 0) {
+				currentIndex--;
+				showReview(currentIndex);
+			}
+		});
+
+		nextBtn.addEventListener("click", function (e) {
+			e.preventDefault();
+			if (currentIndex < reviews.length - 1) {
+				currentIndex++;
+				showReview(currentIndex);
+			}
+		});
+
+		showReview(currentIndex); // Initial check
+	});
+
+
+</script>
