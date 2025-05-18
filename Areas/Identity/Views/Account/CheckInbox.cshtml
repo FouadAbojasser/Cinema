@@ -1,0 +1,48 @@
+﻿<div class="container-scroller">
+    <div class="container-fluid page-body-wrapper full-page-wrapper">
+        <div class="row w-100 m-0">
+            <div class="content-wrapper full-page-wrapper d-flex align-items-center auth login-bg">
+                <div class="card col-lg-4 mx-auto">
+                    <div class="card-body px-5 py-5">
+                        <h3 class="card-title text-left mb-0">Reset Password Request</h3>
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="w-100 text-md-left" style="font-size: 1.1rem;">
+                                        A password reset link has been sent to your email address.<br>
+                                        <br>
+                                        Please check your inbox and follow the instructions to reset your password.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-30">
+                                <a href="/Guest/Home/Index" class="btn btn-primary btn-block enter-btn">Back Home</a>
+                            </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- content-wrapper ends -->
+        </div>
+        <!-- row ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if (TempData["Notification"] != null)
+{
+    <script>
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "@TempData["Notification"]",
+            showConfirmButton: false,
+            timer: 1500,
+            background: "#1e1e1e", // dark background
+            color: "#ffffff", // white text
+            iconColor: "#00ff00" // optional: change icon color for dark mode
+        });
+    </script>
+}

@@ -1,12 +1,16 @@
 ﻿using Cinema.Models;
 using Cinema.Models.ViewModels;
+using Cinema.Repositories;
+using Cinema.Repositories.IRepositories;
 using Cinema.Utility;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using NuGet.Common;
 
 namespace Cinema.Areas.Identity.Controllers
 {
@@ -16,13 +20,16 @@ namespace Cinema.Areas.Identity.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
+        private readonly IOTPRepository _otp;
+
         public AccountController(UserManager<ApplicationUser> userManager, 
             SignInManager<ApplicationUser> signInManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender, IOTPRepository oTP)
         {
             _userManager = userManager  ;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _otp = oTP;
         }
 
         public IActionResult Register()
@@ -96,6 +103,7 @@ namespace Cinema.Areas.Identity.Controllers
 
         }
 
+
         public IActionResult Login()
         {
 
@@ -166,6 +174,7 @@ namespace Cinema.Areas.Identity.Controllers
             return RedirectToActionPermanent("Index", "Home", new { area = "Guest" });
         }
 
+
         public async Task<IActionResult> ConfirmEmailAsync(string Id , string UserToken)
         {
            var applicationUser = await _userManager.FindByIdAsync(Id);
@@ -204,31 +213,197 @@ namespace Cinema.Areas.Identity.Controllers
         }
 
 
-
         public IActionResult ResetPasswordRequest()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> ResetPasswordRequestAsync(string UserNameOrEmail)
+        public async Task<IActionResult> ResetPasswordRequestAsync(ResetPasswordRequestVM resetPasswordRequestVM)
         {
             if (!ModelState.IsValid)
             {
-                return View();
+                return View(resetPasswordRequestVM);
             }
 
-            var applicationUser = await _userManager.FindByNameAsync(UserNameOrEmail);
+            var applicationUser = await _userManager.FindByNameAsync(resetPasswordRequestVM.UserNameOrEmail);
 
             if (applicationUser is null)
             {
-                applicationUser = await _userManager.FindByEmailAsync(UserNameOrEmail);
+                applicationUser = await _userManager.FindByEmailAsync(resetPasswordRequestVM.UserNameOrEmail);
             }
 
-           return View(applicationUser);
+            if (applicationUser is null)
+            {
+                ModelState.AddModelError(string.Empty, "Username or Email does not exist!");
+
+                return View(resetPasswordRequestVM);
+            }
+            else
+            {
+                if(resetPasswordRequestVM.ResetMethod == "OTP")
+                {
+
+                    //Using OTP
+                    int GenOTP = new Random().Next(1000, 9999);
+
+                    //Needed for ResetPassword
+                    string token = await _userManager.GeneratePasswordResetTokenAsync(applicationUser);
+
+                    //Add OTP to Database
+                    await _otp.CreateAsync(new OTP()
+                    {
+                        OTP_Number = GenOTP,
+                        ApplicationUserId = applicationUser.Id,
+                        RequestDateTime = DateTime.UtcNow,
+                        ExpairationDateTime = DateTime.UtcNow.AddMinutes(30),
+                        UsedByUser = false
+
+                    });
+
+                    await _otp.CommitAsync();
+
+                    //Generating HTML OTP Message
+                    string templatePath_otp = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email-templates", "PasswordResetOTP.html");
+                    string emailBody_otp = await System.IO.File.ReadAllTextAsync(templatePath_otp);
+                    emailBody_otp = emailBody_otp.Replace("{{UserName}}", applicationUser.UserName)
+                                         .Replace("{{YourOTP}}", GenOTP.ToString());
+
+                    //Sending Confirmation Email
+                    await _emailSender.SendEmailAsync(applicationUser.Email!, "Reset Password Email", emailBody_otp);
+
+                    TempData["Notification"] = "Password Reset has been requested successfully!";
+
+
+                    return RedirectToAction("NewPasswordOTP" , "Account", new {area = "Identity", Token = token, ApplicationUserId = applicationUser.Id });
+                }
+
+                else if (resetPasswordRequestVM.ResetMethod == "ConfirmationLink")
+                {
+                    //Using Token
+                    string token = await _userManager.GeneratePasswordResetTokenAsync(applicationUser);
+
+                    var ResetPasswordConfirmationLink = Url.Action("NewPassword", "Account", new { area = "Identity", Token = token, ApplicationUserId = applicationUser.Id }, Request.Scheme);
+
+                    //Generating HTML Confirmation Message
+                    string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email-templates", "PasswordResetLink.html");
+                    string emailBody = await System.IO.File.ReadAllTextAsync(templatePath);
+                    emailBody = emailBody.Replace("{{UserName}}", applicationUser.UserName)
+                                         .Replace("{{ConfirmationLink}}", ResetPasswordConfirmationLink);
+
+                    //Sending Confirmation Email
+                    await _emailSender.SendEmailAsync(applicationUser.Email!, "Reset Password Email", emailBody);
+
+
+                    TempData["Notification"] = "Password Reset has been requested successfully!";
+                   
+                }
+
+                return View(nameof(CheckInbox));
+
+            }
+        }
+
+        public IActionResult CheckInbox()
+        {
+            return View();
+        }
+
+
+        public IActionResult NewPassword()
+        {
+            return View();
+        }
+
+        public IActionResult NewPasswordOTP()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> NewPasswordOTPAsync(NewPasswordOTPVM newPasswordOTPVM)
+        {
+
+            if (!ModelState.IsValid)
+            {
+                return View(newPasswordOTPVM);
+            }
+
+            var applicationUser = await _userManager.FindByIdAsync(newPasswordOTPVM.ApplicationUserId);
+
+            if (applicationUser is not null)
+            {
+                var OTPinDB = _otp.Get(e => e.ApplicationUserId == newPasswordOTPVM.ApplicationUserId).LastOrDefault();
+
+                if (OTPinDB != null && OTPinDB.OTP_Number == newPasswordOTPVM.OTP && DateTime.UtcNow < OTPinDB.ExpairationDateTime)
+                {
+                    var result = await _userManager.ResetPasswordAsync(applicationUser,newPasswordOTPVM.Token, newPasswordOTPVM.NewPassword);
+
+                    if (result.Succeeded)
+                    {
+                        TempData["Notification"] = "Yor Password has been reset Successfully!";
+
+                        OTPinDB.UsedByUser = true;
+                        _otp.Update(OTPinDB);
+                        await _otp.CommitAsync();
+
+                        return RedirectToAction("Index", "Home", new { area = "Guest" });
+                    }
+                    else
+                    {
+                        TempData["Notification"] = string.Join(", ", result.Errors.Select(e => e.Description));
+                    }
+
+                       
+                }
+                else if(OTPinDB != null && OTPinDB.OTP_Number == newPasswordOTPVM.OTP && DateTime.UtcNow > OTPinDB.ExpairationDateTime)
+                {
+                    ModelState.AddModelError(string.Empty, "OTP Expired!");
+
+                    return View(newPasswordOTPVM);
+                }
+                else if (OTPinDB != null && OTPinDB.OTP_Number != newPasswordOTPVM.OTP)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid OTP!");
+
+                    return View(newPasswordOTPVM);
+                }
+
+            }
+
+            return View(newPasswordOTPVM);
 
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> NewPasswordAsync(NewPasswordVM newPasswordVM)
+        {
+            if (!ModelState.IsValid) { 
+                return View(newPasswordVM);
+            }
+
+            var applicationUser = await _userManager.FindByIdAsync(newPasswordVM.ApplicationUserId);
+
+            if (applicationUser is not null)
+            {
+                var result = await _userManager.ResetPasswordAsync(applicationUser, newPasswordVM.Token, newPasswordVM.NewPassword);
+
+                if (result.Succeeded)
+                {
+                    TempData["Notification"] = "Yor Password has been reset Successfully!";
+
+                    return RedirectToAction("Index", "Home", new { area = "Guest" });
+
+                }
+                else
+                {
+                    TempData["Notification"] = string.Join(", ", result.Errors.Select(e => e.Description));
+                }
+            }
+
+            return BadRequest();
+
+        }
 
 
 

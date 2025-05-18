@@ -43,6 +43,8 @@ namespace Cinema
 
             builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
+            builder.Services.AddScoped<IOTPRepository, OTPRepository>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

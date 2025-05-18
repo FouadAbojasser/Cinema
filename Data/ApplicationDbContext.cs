@@ -30,7 +30,7 @@ namespace Cinema.Data
         public DbSet<Theater> Theaters { get; set; }
         public DbSet<MovieTheater> MovieTheaters { get; set; }
         public DbSet<Review> Reviews { get; set; }
-
+        public DbSet<OTP> OTPs { get; set; }
 
 
 
