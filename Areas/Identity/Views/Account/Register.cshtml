@@ -57,9 +57,14 @@
                                 <button class="btn btn-facebook col mr-2">
                                     <i class="mdi mdi-facebook"></i> Facebook
                                 </button>
-                                <button class="btn btn-google col">
-                                    <i class="mdi mdi-google-plus"></i> Google plus
-                                </button>
+
+                                <form asp-area="Identity" asp-controller="Account" asp-action="ExternalLogin" method="post">
+                                    <input type="hidden" name="provider" value="Google" />
+                                    <button type="submit" class="btn btn-google col">
+                                        <i class="mdi mdi-google-plus"></i> Google plus
+                                    </button>
+                                </form>
+
                             </div>
                             <p class="sign-up text-center">Already have an Account? <a href="/Identity/Account/Login"> Sign In</a></p>
                             <p class="terms">By creating an account you are accepting our <a href="#">Terms & Conditions</a></p>

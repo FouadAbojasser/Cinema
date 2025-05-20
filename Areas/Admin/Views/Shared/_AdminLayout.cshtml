@@ -37,7 +37,7 @@
 					<li class="nav-item nav-profile dropdown">
 						<a class="nav-link" href="#" data-toggle="dropdown" id="profileDropdown">
 							<img src="~/img/images/faces/face5.jpg" alt="profile" />
-							<span class="nav-profile-name">Fouad </span>
+							<span class="nav-profile-name">@User.Identity!.Name</span>
 						</a>
 						<div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
 							<a class="dropdown-item">
@@ -252,9 +252,25 @@
 					</a>
 					<div class="collapse" id="ui-management">
 						<ul class="nav flex-column sub-menu">
-							<li class="nav-item"> <a class="nav-link" href="/Admin/Users">Users</a></li>
+							<li class="nav-item"> <a class="nav-link" href="/Admin/Users/">Users</a></li>
 							<li class="nav-item"> <a class="nav-link" href="/Admin/Cinemas">Cinemas</a></li>
 							<li class="nav-item"> <a class="nav-link" href="/Admin/Tickets">Tickets</a></li>
+						</ul>
+					</div>
+				</li>
+
+
+				<!-- Second section: Services -->
+				<li class="nav-item">
+					<a class="nav-link" data-toggle="collapse" href="#ui-services" aria-expanded="false" aria-controls="ui-services">
+						<i class="typcn typcn-briefcase menu-icon"></i>
+						<span class="menu-title">Services</span>
+						<i class="menu-arrow"></i>
+					</a>
+					<div class="collapse" id="ui-services">
+						<ul class="nav flex-column sub-menu">
+							<li class="nav-item"> <a class="nav-link" href="#">Service 1</a></li>
+							<li class="nav-item"> <a class="nav-link" href="#">Service 2</a></li>
 						</ul>
 					</div>
 				</li>
@@ -321,6 +337,37 @@
 	
 	@await RenderSectionAsync("Scripts", required: false)
 
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+		  // Restore the expanded menu from localStorage
+		  const activeMenu = localStorage.getItem('activeSidebarMenu');
+		  if (activeMenu) {
+			const element = document.querySelector(activeMenu);
+			if (element && element.classList.contains('collapse')) {
+			  element.classList.add('show');
+			  const parentLink = document.querySelector(`a[href="${activeMenu}"]`);
+			  if (parentLink) {
+				parentLink.setAttribute('aria-expanded', 'true');
+			  }
+			}
+		  }
+
+		  // Add click listeners to all collapsible menu toggles
+		  const toggles = document.querySelectorAll('a[data-toggle="collapse"]');
+		  toggles.forEach(function (toggle) {
+			toggle.addEventListener('click', function () {
+			  const target = toggle.getAttribute('href');
+			  const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+
+			  if (!isExpanded) {
+				localStorage.setItem('activeSidebarMenu', target);
+			  } else {
+				localStorage.removeItem('activeSidebarMenu');
+			  }
+			});
+		  });
+		});
+	</script>
 
 
 </body>

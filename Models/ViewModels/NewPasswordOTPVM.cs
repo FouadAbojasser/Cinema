@@ -6,7 +6,7 @@ namespace Cinema.Models.ViewModels
     {
         public string ApplicationUserId { get; set; } = null!;
         [Required(ErrorMessage = "OTP is required!")]
-        public int OTP { get; set; } 
+        public int? OTP { get; set; } 
         public string Token { get; set; } = null!;
         [Required]
         [DataType(DataType.Password)]

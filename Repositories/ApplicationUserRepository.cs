@@ -4,13 +4,12 @@ using Cinema.Repositories.IRepositories;
 
 namespace Cinema.Repositories
 {
-    public class OTPRepository : Repository<OTP>, IOTPRepository
+    public class ApplicationUserRepository : Repository<ApplicationUser>, IApplicationUserRepository
     {
         private readonly ApplicationDbContext dbContext;
-        public OTPRepository(ApplicationDbContext dbContext) : base(dbContext)
+        public ApplicationUserRepository(ApplicationDbContext dbContext) : base(dbContext)
         {
             this.dbContext = dbContext;
-
         }
     }
 }

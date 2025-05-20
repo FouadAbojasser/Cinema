@@ -1,8 +1,9 @@
 ﻿using System.Linq;
-using Cinema.Data;
+using Cinema;
 using Cinema.Models;
 using Cinema.Models.ViewModels;
 using Cinema.Repositories.IRepositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.EntityFrameworkCore;
@@ -16,22 +17,27 @@ namespace Cinema.Areas.Admin.Controllers
     {
         //private readonly ApplicationDbContext _dbcontext = new ();
 
-        private readonly IActorRepository _actorRepository;
-        private readonly IDirectorRepository _directorRepository;
-        private readonly IGenreRepository _genreRepository;
-        private readonly IMovieRepository _movieRepository;
+        //private readonly IActorRepository _actorRepository;
+        //private readonly IDirectorRepository _directorRepository;
+        //private readonly IGenreRepository _genreRepository;
+        //private readonly IMovieRepository _movieRepository;
+        //public MoviesController(IActorRepository actorRepository, IDirectorRepository directorRepository, IGenreRepository genreRepository, IMovieRepository movieRepository)
+        //{
+        //    _actorRepository = actorRepository;
+        //    _directorRepository = directorRepository;
+        //    _genreRepository = genreRepository;
+        //    _movieRepository = movieRepository;
+        //}
 
-        public MoviesController(IActorRepository actorRepository, IDirectorRepository directorRepository, IGenreRepository genreRepository, IMovieRepository movieRepository)
+
+        private readonly IUnitOfWork _unitOfWork;
+        public MoviesController(IUnitOfWork unitOfWork)
         {
-            _actorRepository = actorRepository;
-            _directorRepository = directorRepository;
-            _genreRepository = genreRepository;
-            _movieRepository = movieRepository;
+            _unitOfWork = unitOfWork;
         }
-
         public IActionResult Index()
         {
-            var movies = _movieRepository.Get(
+            var movies = _unitOfWork.Movie.Get(
                 null,
                 [e => e.Genres, e => e.Director],
                 false
@@ -40,12 +46,12 @@ namespace Cinema.Areas.Admin.Controllers
             return View(movies);
         }
 
-
+        [Authorize(Roles =$"{SD.SuperAdmin}")]
         public IActionResult Create()
         {
-            var genres = _genreRepository.Get();
-            var actors = _actorRepository.Get();
-            var directors = _directorRepository.Get();
+            var genres = _unitOfWork.Genre.Get();
+            var actors = _unitOfWork.Actor.Get();
+            var directors = _unitOfWork.Director.Get();
 
             var MovieWithNeededData = new MovieGenresActorsDirectorsVM()
             {
@@ -65,21 +71,21 @@ namespace Cinema.Areas.Admin.Controllers
         {
             //movie.Genres = _dbcontext.Genres.Where(g => SelectedGenreIds.Contains(g.Id)).ToList();
 
-            movie.Genres = _genreRepository.Get(
+            movie.Genres = _unitOfWork.Genre.Get(
                 g => SelectedGenreIds.Contains(g.Id)
                 , null, false).ToList();
 
             //movie.Actors = _dbcontext.Actors.Where(a => SelectedActorIds.Contains(a.Id)).ToList();
 
-            movie.Actors = _actorRepository.Get(
+            movie.Actors = _unitOfWork.Actor.Get(
                 a => SelectedActorIds.Contains(a.Id)
                 , null, false).ToList();
 
             movie.DirectorId = SelectedDirectorId;
 
-            await _movieRepository.CreateAsync(movie);
+            await _unitOfWork.Movie.CreateAsync(movie);
 
-            await _movieRepository.CommitAsync();
+            await _unitOfWork.Movie.CommitAsync();
 
             // Handling Single Image - Poster
             if (PosterImage != null && PosterImage.Length > 0)
@@ -150,7 +156,7 @@ namespace Cinema.Areas.Admin.Controllers
                
             }
 
-            await _movieRepository.CommitAsync();
+            await _unitOfWork.Movie.CommitAsync();
 
             TempData["SuccessMessage"] = "Created successfully";
 
@@ -168,7 +174,7 @@ namespace Cinema.Areas.Admin.Controllers
             //    .Include(m=>m.Images)
             //    .FirstOrDefault(m=>m.Id == id);
 
-            var movie = _movieRepository.GetOne(
+            var movie = _unitOfWork.Movie.GetOne(
                 m => m.Id == id,
                 [g => g.Genres, a => a.Actors, d => d.Director, m => m.Images]);
 
@@ -178,9 +184,9 @@ namespace Cinema.Areas.Admin.Controllers
                 return Task.FromResult<IActionResult>(RedirectToAction("NotFoundPage", "Home"));
             }
 
-            var genres = _genreRepository.Get();
-            var actors =_actorRepository.Get();
-            var directors = _directorRepository.Get();
+            var genres = _unitOfWork.Genre.Get();
+            var actors =_unitOfWork.Actor.Get();
+            var directors = _unitOfWork.Director.Get();
 
             var MovieWithNeededData = new MovieGenresActorsDirectorsVM()
             {
@@ -213,7 +219,7 @@ namespace Cinema.Areas.Admin.Controllers
             //    .Include(i => i.Images)
             //    .FirstOrDefault(m => m.Id == movie.Id);
 
-            var existingMovie = _movieRepository.GetOne(
+            var existingMovie = _unitOfWork.Movie.GetOne(
                 m => m.Id == movie.Id,
                 [m => m.Genres, m => m.Actors, m => m.Director, i => i.Images],
                 false
@@ -263,7 +269,7 @@ namespace Cinema.Areas.Admin.Controllers
             // Handling Sliders
             await HandlingUpdateSlidersAsync(existingMovie, RemovedSlidersUrls, SliderImages);
 
-            await _movieRepository.CommitAsync();
+            await _unitOfWork.Movie.CommitAsync();
 
             TempData["SuccessMessage"] = "Edited successfully";
 
@@ -278,7 +284,7 @@ namespace Cinema.Areas.Admin.Controllers
             //.Include(m => m.Actors)
             //.FirstOrDefault(m => m.Id == id);
 
-            var movie = _movieRepository.GetOne(
+            var movie = _unitOfWork.Movie.GetOne(
                 m => m.Id == id,
                 [m => m.Actors],
                 false
@@ -312,9 +318,9 @@ namespace Cinema.Areas.Admin.Controllers
                 }
             }
 
-            _movieRepository.Delete(movie);
+            _unitOfWork.Movie.Delete(movie);
 
-            await _movieRepository.CommitAsync();
+            await _unitOfWork.Movie.CommitAsync();
 
             TempData["SuccessMessage"] = "Deleted successfully";
 
@@ -352,7 +358,7 @@ namespace Cinema.Areas.Admin.Controllers
             {
                 if (!currentGenres.Contains(genreId))
                 {
-                    var genre = _genreRepository.GetOne(
+                    var genre = _unitOfWork.Genre.GetOne(
                         e=>e.Id == genreId
                         );
 
@@ -390,7 +396,7 @@ namespace Cinema.Areas.Admin.Controllers
             {
                 if (!currentActors.Contains(actorId))
                 {
-                    var actor = _actorRepository.GetOne(
+                    var actor = _unitOfWork.Actor.GetOne(
                         a => a.Id == actorId);
 
                     if (actor != null)

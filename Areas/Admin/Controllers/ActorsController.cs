@@ -1,9 +1,5 @@
-﻿using Cinema.Data;
-using Cinema.Models;
+﻿using Cinema.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Cinema.Repositories;
-using System.Threading.Tasks;
 using Cinema.Repositories.IRepositories;
 
 namespace Cinema.Areas.Admin.Controllers
@@ -12,17 +8,24 @@ namespace Cinema.Areas.Admin.Controllers
     public class ActorsController : Controller
     {
         //private readonly ApplicationDbContext _dBcontext = new();
-        private readonly IActorRepository _repository; //= new ActorRepository();
-       
-        public ActorsController(IActorRepository repository)
+        //private readonly IActorRepository _repository; //= new ActorRepository();
+        //public ActorsController(IActorRepository repository)
+        //{
+        //    _repository = repository;
+
+        //}
+
+        //UnitOfWork تم استبداله بال  
+        private readonly IUnitOfWork _unitOfWork; //= new ActorRepository();
+        public ActorsController(IUnitOfWork unitOfWork)
         {
-            _repository = repository;
-           
+            _unitOfWork = unitOfWork;
         }
+
 
         public IActionResult Index()
         {
-            var actors = _repository.Get(null, [m => m.Movies]);
+            var actors = _unitOfWork.Actor.Get(null, [m => m.Movies]);
            
             foreach (var actor in actors)
             {
@@ -74,9 +77,9 @@ namespace Cinema.Areas.Admin.Controllers
                 // Save the image name to the database
                 actor.Img = fileName;
 
-                await _repository.CreateAsync(actor);
+                await _unitOfWork.Actor.CreateAsync(actor);
 
-                await _repository.CommitAsync();
+                await _unitOfWork.Actor.CommitAsync();
                
                 TempData["SuccessMessage"] = "Created successfully";
 
@@ -89,7 +92,7 @@ namespace Cinema.Areas.Admin.Controllers
 
         public IActionResult Edit(int id)
         {
-            var actor = _repository.GetOne(e=>e.Id==id);
+            var actor = _unitOfWork.Actor.GetOne(e=>e.Id==id);
             if (actor != null)
             {
                 return View(actor);
@@ -101,7 +104,7 @@ namespace Cinema.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> EditAsync(Actor actor, IFormFile Img)
         {
-            var oldActorInDB = _repository.GetOne(e => e.Id == actor.Id,null);
+            var oldActorInDB = _unitOfWork.Actor.GetOne(e => e.Id == actor.Id,null);
             ModelState.Remove("Img");
 
             if (ModelState.IsValid && oldActorInDB != null)
@@ -152,9 +155,9 @@ namespace Cinema.Areas.Admin.Controllers
                     actor.Img = oldActorInDB.Img;
                 }
 
-                _repository.Update(actor);
+                _unitOfWork.Actor.Update(actor);
 
-                await _repository.CommitAsync();
+                await _unitOfWork.Actor.CommitAsync();
 
                 TempData["SuccessMessage"] = "Edited successfully";
 
@@ -168,7 +171,7 @@ namespace Cinema.Areas.Admin.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             
-            var actor = _repository.GetOne(a => a.Id == id, [a => a.Movies]);
+            var actor = _unitOfWork.Actor.GetOne(a => a.Id == id, [a => a.Movies]);
 
             if (actor == null)
             {
@@ -196,9 +199,9 @@ namespace Cinema.Areas.Admin.Controllers
 
             actor.Movies.Clear();
 
-            _repository.Delete(actor);
+            _unitOfWork.Actor.Delete(actor);
 
-            await _repository.CommitAsync();
+            await _unitOfWork.Actor.CommitAsync();
 
             TempData["SuccessMessage"] = "Deleted successfully";
 

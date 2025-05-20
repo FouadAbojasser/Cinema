@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Cinema.Data;
+using Cinema;
 using Cinema.Models;
 using Cinema.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;

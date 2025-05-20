@@ -14,15 +14,18 @@ namespace Cinema.Areas.Identity.Controllers
     [Area("Identity")]
     public class UserActivitiesController : Controller
     {
-        private readonly IReviewRepository _reviewRepository;
+        //private readonly IReviewRepository _reviewRepository;
+        //private readonly IMovieRepository _movieRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IMovieRepository _movieRepository;
+        
 
-        public UserActivitiesController(IReviewRepository reviewRepository, UserManager<ApplicationUser> userManager, IMovieRepository movieRepository)
+        public UserActivitiesController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
         {
-            _reviewRepository = reviewRepository;
+            //_reviewRepository = reviewRepository;
+            //_movieRepository = movieRepository;
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
-            _movieRepository = movieRepository;
         }
 
         // This is moving comment navigation to the server side.
@@ -45,7 +48,7 @@ namespace Cinema.Areas.Identity.Controllers
         public async Task<IActionResult> AddReviewAsync(AddReviewVM reviewVM)
         {
             var user = await _userManager.GetUserAsync(User);
-            var movie =  _movieRepository.GetOne(e => e.Id == reviewVM.MovieId,null,false);
+            var movie =  _unitOfWork.Movie.GetOne(e => e.Id == reviewVM.MovieId,null,false);
 
             if (user == null || movie == null)
             {
@@ -63,8 +66,8 @@ namespace Cinema.Areas.Identity.Controllers
                 
             };
 
-            await _reviewRepository.CreateAsync(userReview);
-            await _reviewRepository.CommitAsync();
+            await _unitOfWork.Review.CreateAsync(userReview);
+            await _unitOfWork.Review.CommitAsync();
 
             return RedirectToAction("MovieDetails", "Home", new { area = "Guest", id = movie.Id });
         }

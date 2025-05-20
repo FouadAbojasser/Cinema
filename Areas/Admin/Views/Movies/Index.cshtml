@@ -18,13 +18,17 @@
 						</tr>
 					</thead>
 					<tbody>
+						@{
+
+							int count = 1;
+						}
 
 						@foreach (var movie in Model)
 
 						{
 
 							<tr>
-								<td>@movie.Id</td>
+								<td>@(count++)</td>
 								<td>@movie.Title </td>
 								<td>@movie.ProductionDate?.ToString("dd-MMM-yyyy")</td>
 								<td>@movie.ReleaseDate?.ToString("dd-MMM-yyyy")</td>
@@ -37,7 +41,7 @@
 											<p>@genre.Title</p>
 										}
 									}
-									
+
 								</td>
 								<td>@movie.Director.Name</td>
 								<td>
@@ -67,9 +71,12 @@
 
 
 <!-- Create Floating Button -->
-<a id="settings-trigger" href="/Admin/Movies/Create">
-	<h5 style="color: aliceblue; vertical-align:central; margin:0px">+</h5>
-</a>
+@if (User.IsInRole(SD.SuperAdmin) || User.IsInRole(SD.Admin))
+{
+	<a id="settings-trigger" href="/Admin/Movies/Create">
+		<h5 style="color: aliceblue; vertical-align:central; margin:0px">+</h5>
+	</a>
+}
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

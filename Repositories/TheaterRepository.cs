@@ -1,6 +1,6 @@
-﻿using Cinema.Data;
-using Cinema.Models;
+﻿using Cinema.Models;
 using Cinema.Repositories.IRepositories;
+using Cinema;
 
 namespace Cinema.Repositories
 {

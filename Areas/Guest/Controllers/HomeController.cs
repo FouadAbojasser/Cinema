@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
-using Cinema.Data;
+using AspNetCoreGeneratedDocument;
+using Cinema;
 using Cinema.Models;
 using Cinema.Models.ViewModels;
 using Cinema.Repositories.IRepositories;
@@ -13,37 +14,32 @@ public class HomeController : Controller
 
     //private readonly ApplicationDbContext _dbcontext = new ();
   
-    private readonly ILogger<HomeController> _logger;
+    //Inject UnitOfWork Only
+    private readonly IUnitOfWork _unitOfWork;
 
-    private readonly IMovieRepository _movieRepository;
+    //private readonly IMovieRepository _movieRepository;
 
-    private readonly IActorRepository _actorRepository;
+    //private readonly IActorRepository _actorRepository;
 
-    private readonly IGenreRepository _genreRepository;
+    //private readonly IGenreRepository _genreRepository;
 
-    private readonly IReviewRepository _reviewRepository;
+    //private readonly IReviewRepository _reviewRepository;
 
-    public HomeController(IMovieRepository movieRepository,
-                            IActorRepository actorRepository,
-                            IGenreRepository genreRepository,
-                            IReviewRepository reviewRepository,
-                            ILogger<HomeController> logger)
+    
+
+    public HomeController(IUnitOfWork unitOfWork)
     {
-   
-        _movieRepository = movieRepository;
-
-        _actorRepository = actorRepository;
-
-        _genreRepository = genreRepository;
-
-        _reviewRepository = reviewRepository;
-
-        _logger = logger;
+        _unitOfWork = unitOfWork;
+        //_movieRepository = movieRepository;
+        //_actorRepository = actorRepository;
+        //_genreRepository = genreRepository;
+        //_reviewRepository = reviewRepository;
     }
 
 
     public IActionResult Index()
     {
+
         var today = DateOnly.FromDateTime(DateTime.Now);
 
         //var Latest = _dbcontext.Movies
@@ -52,7 +48,7 @@ public class HomeController : Controller
         //    .OrderByDescending(e => e.ProductionDate)
         //    .Take(6);
 
-        var Latest = _movieRepository.Get(
+        var Latest = _unitOfWork.Movie.Get(
             e => e.ReleaseDate < today, 
             [e => e.Images],
             false,
@@ -68,7 +64,7 @@ public class HomeController : Controller
         //    .Take(6);
 
 
-        var TopRated = _movieRepository.Get(
+        var TopRated = _unitOfWork.Movie.Get(
             null,
             [e => e.Actors, e => e.Images],
             false,
@@ -84,7 +80,7 @@ public class HomeController : Controller
         //    .Take(6);
 
 
-        var CommingSoon = _movieRepository.Get(
+        var CommingSoon = _unitOfWork.Movie.Get(
             e => e.ReleaseDate >= today,
             [e => e.Images],
             true,
@@ -97,7 +93,7 @@ public class HomeController : Controller
         //    .OrderByDescending(e => e.ProductionDate)
         //    .Take(6);
 
-        var RecentlyReleased = _movieRepository.Get(
+        var RecentlyReleased = _unitOfWork.Movie.Get(
             e => e.ReleaseDate >= today.AddDays(-60) && e.ReleaseDate <= today,
             [e => e.Images],
             false,
@@ -111,7 +107,7 @@ public class HomeController : Controller
         //    .ThenByDescending(e => e.ReleaseDate)
         //    .Take(4);
 
-        var TopTrailerSection = _movieRepository.Get(
+        var TopTrailerSection = _unitOfWork.Movie.Get(
             null,
             [g => g.Genres, m => m.Images],
             false,
@@ -147,8 +143,9 @@ public class HomeController : Controller
 
         //GetOne لها الأن عدد 2 امبلمنتيشن واحد جاي من
         //الريبوزتري العام والثاني جاي من الريبوزتري الخاص بالموفي 
-        
-        var movie = _movieRepository.GetOne(
+
+       
+        var movie = _unitOfWork.Movie.GetOne(
             e => e.Id == id,
             query => query
             .Include(e => e.Images)
@@ -158,7 +155,7 @@ public class HomeController : Controller
             .Include(e => e.MovieTheaters)
             .ThenInclude(mt => mt.Theater)
             .Include(r => r.Reviews)
-            .ThenInclude(u=>u.applicationUser));
+            .ThenInclude(u=>u.applicationUser)); //Deep Include of Navigation Property Movie->Review->ApplicationUser
 
         if (movie == null)
         {
@@ -178,7 +175,7 @@ public class HomeController : Controller
         //    .Where(m => m.Genres.Select(g => g.Id).Intersect(movieGenreIds).Count() >= 2);
 
 
-        var similarMovies = _movieRepository.Get(
+        var similarMovies = _unitOfWork.Movie.Get(
             e => e.Id != id && e.Genres.Select(g => g.Id).Intersect(movieGenreIds).Count() >= 2,
             query => query
             .Include(e => e.Images)
@@ -205,13 +202,13 @@ public class HomeController : Controller
     public IActionResult ActorDetails(int id)
     {
         
-        var actor = _actorRepository.GetOne(
+        var actor = _unitOfWork.Actor.GetOne(
             e => e.Id == id,
             [e => e.Movies]
             );
 
 
-        var actorMovies = _movieRepository.Get(
+        var actorMovies = _unitOfWork.Movie.Get(
             m => m.Actors.Any(a => a.Id == id),
             [m => m.Actors, e => e.Images]
             );
@@ -228,9 +225,9 @@ public class HomeController : Controller
 
     public IActionResult Movies()
     {
-        var movies = _movieRepository.Get(null, [e => e.Genres, e => e.Images]);
+        var movies = _unitOfWork.Movie.Get(null, [e => e.Genres, e => e.Images]);
           
-        var geners = _genreRepository.Get();
+        var geners = _unitOfWork.Genre.Get();
 
         var moviesWithGeners = new MoviesWithGenresVM
         {
@@ -241,6 +238,17 @@ public class HomeController : Controller
         return View(moviesWithGeners);
     }
 
+    //public IActionResult _Comments(int MovieId, int skip = 0)
+    //{
+    //    var OneReviewAtATime = _reviewRepository
+    //        .Get(m => m.Movie!.Id == MovieId, [u=>u.applicationUser!])
+    //        .Skip(skip)
+    //        .Take(1)
+    //        .ToList();
+
+    //    return PartialView("_Comment", OneReviewAtATime);
+    //}
+
 
 
 
@@ -248,6 +256,7 @@ public class HomeController : Controller
     {
         return View();
     }
+
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

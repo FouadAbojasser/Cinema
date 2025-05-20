@@ -377,26 +377,9 @@
 						<a href="#"><i class="icofont icofont-comment"></i> @Model.Reviews?.Count Comments</a>
 					</div>
 
-					<div id="reviewContainer">
-						@for (int i = 0; i < Model.Reviews?.Count; i++)
-						{
-							var review = Model.Reviews[i];
-							<div class="review-item" data-index="@i" style="display: @(i == 0 ? "block" : "none")">
-								<div class="review-author">
-									<h6 style="color:darkcyan; margin-bottom:10px">
-										By: @review.applicationUser?.UserName &nbsp;&nbsp; at: @review.CreatedAt?.ToString("MMMM dd, yyyy")
-									</h6>
-								</div>
+					
+					<partial name="_Comments" model="Model.Reviews" />
 
-								@* <div class="review-rating"> *@
-								@* 	Rating: @review.Rating/10 *@
-								@* </div> *@
-								<div class="review-content">
-									<p>@review.Comment</p>
-								</div>
-							</div>
-						}
-					</div>
 
 					<div class="details-thumb">
 						<a id="prevBtn" href="#" class="details-thumb-prev">
@@ -416,14 +399,6 @@
 							</div>
 						</a>
 					</div>
-
-
-		
-
-
-
-
-
 
 
 
@@ -474,6 +449,7 @@
 		</div>
 	</div>
 </section><!-- blog area end -->
+
 @section Scripts {
 	<script>
 		// Initialize carousel

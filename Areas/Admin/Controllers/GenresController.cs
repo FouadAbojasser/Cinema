@@ -1,4 +1,4 @@
-﻿using Cinema.Data;
+﻿using Cinema;
 using Cinema.Models;
 using Cinema.Repositories;
 using Cinema.Repositories.IRepositories;
@@ -12,17 +12,17 @@ namespace Cinema.Areas.Admin.Controllers
     {
         //private readonly ApplicationDbContext _dBcontext = new(); 
 
-        private readonly IGenreRepository _repository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GenresController(IGenreRepository repository)
+        public GenresController(IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
 
 
         public IActionResult Index()
         {
-            var genres = _repository.Get(null,[e=>e.Movies]);
+            var genres = _unitOfWork.Genre.Get(null,[e=>e.Movies]);
 
             return View(genres);
         }
@@ -67,9 +67,9 @@ namespace Cinema.Areas.Admin.Controllers
                 // Save the image name to the database
                 genre.Img = fileName;
 
-                _repository.CreateAsync(genre);
+                _unitOfWork.Genre.CreateAsync(genre);
 
-                _repository.CommitAsync();
+                _unitOfWork.Genre.CommitAsync();
 
                 TempData["SuccessMessage"] = "Created successfully";
 
@@ -82,7 +82,7 @@ namespace Cinema.Areas.Admin.Controllers
 
         public IActionResult Edit(int id)
         {
-            var genre = _repository.GetOne(e=>e.Id==id);
+            var genre = _unitOfWork.Genre.GetOne(e=>e.Id==id);
 
             if (genre != null)
             {
@@ -95,7 +95,7 @@ namespace Cinema.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult Edit(Genre genre, IFormFile Img)
         {
-            var oldGenreInDB = _repository.GetOne(e => e.Id == genre.Id);
+            var oldGenreInDB = _unitOfWork.Genre.GetOne(e => e.Id == genre.Id);
 
             ModelState.Remove("Img");
 
@@ -148,9 +148,9 @@ namespace Cinema.Areas.Admin.Controllers
                     genre.Img = oldGenreInDB.Img;
                 }
 
-                _repository.Update(genre);
+                _unitOfWork.Genre.Update(genre);
 
-                _repository.CommitAsync();
+                _unitOfWork.Genre.CommitAsync();
 
                 TempData["SuccessMessage"] = "Edited successfully";
 
@@ -164,7 +164,7 @@ namespace Cinema.Areas.Admin.Controllers
 
         public IActionResult Delete(int id)
         {
-            var genre = _repository.GetOne(g => g.Id == id, [m => m.Movies]);
+            var genre = _unitOfWork.Genre.GetOne(g => g.Id == id, [m => m.Movies]);
 
             if (genre == null)
             {
@@ -192,9 +192,9 @@ namespace Cinema.Areas.Admin.Controllers
 
             genre.Movies.Clear();
 
-            _repository.Delete(genre);
+            _unitOfWork.Genre.Delete(genre);
 
-            _repository.CommitAsync();
+            _unitOfWork.Genre.CommitAsync();
 
             TempData["SuccessMessage"] = "Deleted successfully";
 

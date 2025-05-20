@@ -1,4 +1,4 @@
-﻿using Cinema.Data;
+﻿using Cinema;
 using Cinema.Models;
 using System.Linq.Expressions;
 using System.Linq;

@@ -1,5 +1,4 @@
-﻿using Cinema.Data;
-using Cinema.Models;
+﻿using Cinema.Models;
 using Cinema.Repositories.IRepositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,16 +9,22 @@ namespace Cinema.Areas.Admin.Controllers
     public class DirectorsController : Controller
     {
         //private readonly ApplicationDbContext _dBcontext = new();
-        private readonly IDirectorRepository _repository;
+        //private readonly IDirectorRepository _unitOfWork.Director;
+        //public DirectorsController(IDirectorRepository repository)
+        //{
+        //    _unitOfWork.Director = repository;
+        //}
 
-        public DirectorsController(IDirectorRepository repository)
+
+        private readonly IUnitOfWork _unitOfWork;
+        public DirectorsController(IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult Index()
         {
-            var directors = _repository.Get(null, [m=>m.Movies]);
+            var directors = _unitOfWork.Director.Get(null, [m=>m.Movies]);
 
             foreach (var director in directors)
             {
@@ -68,9 +73,9 @@ namespace Cinema.Areas.Admin.Controllers
                 // Save the image name to the database
                 director.Img = fileName;
 
-                _repository.CreateAsync(director);
+                _unitOfWork.Director.CreateAsync(director);
 
-                _repository.CommitAsync();
+                _unitOfWork.Director.CommitAsync();
 
                 TempData["SuccessMessage"] = "Created successfully";
 
@@ -84,7 +89,7 @@ namespace Cinema.Areas.Admin.Controllers
 
         public IActionResult Edit(int id)
         {
-            var director = _repository.GetOne(e=>e.Id==id);
+            var director = _unitOfWork.Director.GetOne(e=>e.Id==id);
 
             if (director != null)
             {
@@ -97,7 +102,7 @@ namespace Cinema.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult Edit(Director director, IFormFile Img)
         {
-            var oldDirectorInDB = _repository.GetOne(e => e.Id == director.Id,null,true);
+            var oldDirectorInDB = _unitOfWork.Director.GetOne(e => e.Id == director.Id,null,true);
 
             ModelState.Remove("Img");
 
@@ -149,9 +154,9 @@ namespace Cinema.Areas.Admin.Controllers
                     director.Img = oldDirectorInDB.Img;
                 }
 
-                _repository.Update(director);
+                _unitOfWork.Director.Update(director);
 
-                _repository.CommitAsync();
+                _unitOfWork.Director.CommitAsync();
 
                 TempData["SuccessMessage"] = "Edited successfully";
 
@@ -165,7 +170,7 @@ namespace Cinema.Areas.Admin.Controllers
 
         public IActionResult Delete(int id)
         {
-            var director = _repository.GetOne(e=>e.Id == id);
+            var director = _unitOfWork.Director.GetOne(e=>e.Id == id);
 
             if (director != null)
             {
@@ -188,9 +193,9 @@ namespace Cinema.Areas.Admin.Controllers
                     }
                 }
 
-                _repository.Delete(director);
+                _unitOfWork.Director.Delete(director);
 
-                _repository.CommitAsync();
+                _unitOfWork.Director.CommitAsync();
 
             }
             else

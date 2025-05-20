@@ -1,4 +1,5 @@
-﻿using Cinema.Models;
+﻿using System.Security.Claims;
+using Cinema.Models;
 using Cinema.Models.ViewModels;
 using Cinema.Repositories;
 using Cinema.Repositories.IRepositories;
@@ -18,22 +19,38 @@ namespace Cinema.Areas.Identity.Controllers
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
-        private readonly IOTPRepository _otp;
+        //private readonly IOTPRepository _otp;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AccountController(UserManager<ApplicationUser> userManager, 
-            SignInManager<ApplicationUser> signInManager,
-            IEmailSender emailSender, IOTPRepository oTP)
-        {
+
+        public AccountController(
+                        UserManager<ApplicationUser> userManager, 
+                        SignInManager<ApplicationUser> signInManager,
+                        RoleManager<IdentityRole> roleManager,
+                        IEmailSender emailSender, IUnitOfWork unitOfWork)
+        { 
             _userManager = userManager  ;
+            _roleManager = roleManager ;
             _signInManager = signInManager;
             _emailSender = emailSender;
-            _otp = oTP;
+            //_otp = oTP;
+            _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Register()
+        public async Task<IActionResult> RegisterAsync()
         {
+            //must be in dB initializer not in any action
+            if (!_roleManager.Roles.Any())
+            {
+               await _roleManager.CreateAsync(new IdentityRole(SD.SuperAdmin));
+               await _roleManager.CreateAsync(new IdentityRole(SD.Admin));
+               await _roleManager.CreateAsync(new IdentityRole(SD.Cinema));
+               await _roleManager.CreateAsync(new IdentityRole(SD.Customer));
+            }
+
             return View();
         }
 
@@ -51,7 +68,7 @@ namespace Cinema.Areas.Identity.Controllers
             {
                 UserName = registerVM.UserName,
                 Email = registerVM.Email,
-                DoB = (DateOnly)registerVM.DoB,
+                DoB = (DateOnly)registerVM.DoB!,
                 
             };
 
@@ -78,6 +95,8 @@ namespace Cinema.Areas.Identity.Controllers
                     await _emailSender.SendEmailAsync(applicationUser.Email, "Confirmation Email", emailBody);
 
                     TempData["Notification"] = "User Registered Successfully!, Please Confirm Your Email";
+
+                    await _userManager.AddToRoleAsync(applicationUser, SD.Customer);
 
                     return RedirectToAction("Index", "Home", new { area = "Guest" });
                 }
@@ -250,32 +269,51 @@ namespace Cinema.Areas.Identity.Controllers
                     //Needed for ResetPassword
                     string token = await _userManager.GeneratePasswordResetTokenAsync(applicationUser);
 
-                    //Add OTP to Database
-                    await _otp.CreateAsync(new OTP()
+                    var userLastOTP = _unitOfWork.OTP.Get(e=>e.ApplicationUserId==applicationUser.Id).LastOrDefault();
+
+                    if ((DateTime.UtcNow - userLastOTP!.RequestDateTime).TotalMinutes > 30)
                     {
-                        OTP_Number = GenOTP,
-                        ApplicationUserId = applicationUser.Id,
-                        RequestDateTime = DateTime.UtcNow,
-                        ExpairationDateTime = DateTime.UtcNow.AddMinutes(30),
-                        UsedByUser = false
 
-                    });
+                        //Add OTP to Database
+                        await _unitOfWork.OTP.CreateAsync(new OTP()
+                        {
+                            OTP_Number = GenOTP,
+                            ApplicationUserId = applicationUser.Id,
+                            RequestDateTime = DateTime.UtcNow,
+                            ExpairationDateTime = DateTime.UtcNow.AddMinutes(30),
+                            UsedByUser = false
 
-                    await _otp.CommitAsync();
+                        });
 
-                    //Generating HTML OTP Message
-                    string templatePath_otp = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email-templates", "PasswordResetOTP.html");
-                    string emailBody_otp = await System.IO.File.ReadAllTextAsync(templatePath_otp);
-                    emailBody_otp = emailBody_otp.Replace("{{UserName}}", applicationUser.UserName)
-                                         .Replace("{{YourOTP}}", GenOTP.ToString());
+                        await _unitOfWork.OTP.CommitAsync();
 
-                    //Sending Confirmation Email
-                    await _emailSender.SendEmailAsync(applicationUser.Email!, "Reset Password Email", emailBody_otp);
+                        //Generating HTML OTP Message
+                        string templatePathOTP = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email-templates", "PasswordResetOTP.html");
+                        string emailBodyOTP = await System.IO.File.ReadAllTextAsync(templatePathOTP);
+                        emailBodyOTP = emailBodyOTP.Replace("{{UserName}}", applicationUser.UserName)
+                                             .Replace("{{YourOTP}}", GenOTP.ToString());
 
-                    TempData["Notification"] = "Password Reset has been requested successfully!";
+                        //Sending Confirmation Email
+                        await _emailSender.SendEmailAsync(applicationUser.Email!, "Reset Password Email", emailBodyOTP);
 
+                        TempData["Notification"] = "Password Reset has been requested successfully!";
 
-                    return RedirectToAction("NewPasswordOTP" , "Account", new {area = "Identity", Token = token, ApplicationUserId = applicationUser.Id });
+                        TempData["_validationToken"] = Guid.NewGuid().ToString();
+
+                        return RedirectToAction("NewPasswordOTP", "Account", new { area = "Identity", Token = token, ApplicationUserId = applicationUser.Id });
+                    }
+                    else
+                    {
+                        var timeSinceLastOTP = DateTime.UtcNow - userLastOTP.RequestDateTime;
+
+                        var remainingTime = TimeSpan.FromMinutes(30) - timeSinceLastOTP;
+
+                        ModelState.AddModelError(string.Empty, $"You can use OTP after {remainingTime.ToString("mm\\:ss")} minutes!");
+                        
+                        return View(resetPasswordRequestVM);
+                        
+                    }
+                    
                 }
 
                 else if (resetPasswordRequestVM.ResetMethod == "ConfirmationLink")
@@ -296,7 +334,10 @@ namespace Cinema.Areas.Identity.Controllers
 
 
                     TempData["Notification"] = "Password Reset has been requested successfully!";
-                   
+
+                    //used to prevent accessing Password reset page from the link directly
+                    TempData["_validationToken"] = Guid.NewGuid().ToString();
+
                 }
 
                 return View(nameof(CheckInbox));
@@ -312,13 +353,54 @@ namespace Cinema.Areas.Identity.Controllers
 
         public IActionResult NewPassword()
         {
-            return View();
+            if (TempData["_validationToken"] is not null)
+            {
+             return View();
+            }
+            return BadRequest();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> NewPasswordAsync(NewPasswordVM newPasswordVM)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(newPasswordVM);
+            }
+
+            var applicationUser = await _userManager.FindByIdAsync(newPasswordVM.ApplicationUserId);
+
+            if (applicationUser is not null)
+            {
+                var result = await _userManager.ResetPasswordAsync(applicationUser, newPasswordVM.Token, newPasswordVM.NewPassword);
+
+                if (result.Succeeded)
+                {
+                    TempData["Notification"] = "Yor Password has been reset Successfully!";
+
+                    return RedirectToAction("Index", "Home", new { area = "Guest" });
+
+                }
+                else
+                {
+                    TempData["Notification"] = string.Join(", ", result.Errors.Select(e => e.Description));
+                }
+            }
+
+            return BadRequest();
+
+        }
+
 
         public IActionResult NewPasswordOTP()
         {
-            return View();
+            if (TempData["_validationToken"] is not null)
+            {
+                return View();
+            }
+            return BadRequest();
         }
+
         [HttpPost]
         public async Task<IActionResult> NewPasswordOTPAsync(NewPasswordOTPVM newPasswordOTPVM)
         {
@@ -332,7 +414,7 @@ namespace Cinema.Areas.Identity.Controllers
 
             if (applicationUser is not null)
             {
-                var OTPinDB = _otp.Get(e => e.ApplicationUserId == newPasswordOTPVM.ApplicationUserId).LastOrDefault();
+                var OTPinDB = _unitOfWork.OTP.Get(e => e.ApplicationUserId == newPasswordOTPVM.ApplicationUserId).LastOrDefault();
 
                 if (OTPinDB != null && OTPinDB.OTP_Number == newPasswordOTPVM.OTP && DateTime.UtcNow < OTPinDB.ExpairationDateTime)
                 {
@@ -343,8 +425,8 @@ namespace Cinema.Areas.Identity.Controllers
                         TempData["Notification"] = "Yor Password has been reset Successfully!";
 
                         OTPinDB.UsedByUser = true;
-                        _otp.Update(OTPinDB);
-                        await _otp.CommitAsync();
+                        _unitOfWork.OTP.Update(OTPinDB);
+                        await _unitOfWork.OTP.CommitAsync();
 
                         return RedirectToAction("Index", "Home", new { area = "Guest" });
                     }
@@ -371,37 +453,6 @@ namespace Cinema.Areas.Identity.Controllers
             }
 
             return View(newPasswordOTPVM);
-
-        }
-
-
-        [HttpPost]
-        public async Task<IActionResult> NewPasswordAsync(NewPasswordVM newPasswordVM)
-        {
-            if (!ModelState.IsValid) { 
-                return View(newPasswordVM);
-            }
-
-            var applicationUser = await _userManager.FindByIdAsync(newPasswordVM.ApplicationUserId);
-
-            if (applicationUser is not null)
-            {
-                var result = await _userManager.ResetPasswordAsync(applicationUser, newPasswordVM.Token, newPasswordVM.NewPassword);
-
-                if (result.Succeeded)
-                {
-                    TempData["Notification"] = "Yor Password has been reset Successfully!";
-
-                    return RedirectToAction("Index", "Home", new { area = "Guest" });
-
-                }
-                else
-                {
-                    TempData["Notification"] = string.Join(", ", result.Errors.Select(e => e.Description));
-                }
-            }
-
-            return BadRequest();
 
         }
 
