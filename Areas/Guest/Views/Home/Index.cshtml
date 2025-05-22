@@ -29,7 +29,7 @@
 								<div class="author-review">
 									@{
 										double rate = item.Rate; 
-										double stars = rate / 2; 
+										double stars = rate ; 
 										int fullStars = (int)stars;
 										bool hasHalfStar = (stars - fullStars) >= 0.5;
 										int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
@@ -110,7 +110,7 @@
 									<div class="author-review">
 										@{
 											double rate = Model.TopRated[i].Rate; 
-											double stars = rate / 2; 
+											double stars = rate ; 
 											int fullStars = (int)stars;
 											bool hasHalfStar = (stars - fullStars) >= 0.5;
 											int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
@@ -212,7 +212,7 @@
 										<div class="author-review me-0">
 											@{
 												double rate = movie.Rate; 
-												double stars = rate / 2; 
+												double stars = rate ; 
 												int fullStars = (int)stars; 
 												bool hasHalfStar = (stars - fullStars) >= 0.5;
 												int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
@@ -267,7 +267,7 @@
 										<div class="author-review me-0">
 											@{
 												double rate = movie.Rate; 
-												double stars = rate / 2; 
+												double stars = rate ; 
 												int fullStars = (int)stars; 
 												bool hasHalfStar = (stars - fullStars) >= 0.5;
 												int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
@@ -322,7 +322,7 @@
 										<div class="author-review me-0">
 											@{
 												double rate = movie.Rate; 
-												double stars = rate / 2; 
+												double stars = rate ; 
 												int fullStars = (int)stars; 
 												bool hasHalfStar = (stars - fullStars) >= 0.5;
 												int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
@@ -377,7 +377,7 @@
 										<div class="author-review me-0">
 											@{
 												double rate = movie.Rate; 
-												double stars = rate / 2; 
+												double stars = rate ; 
 												int fullStars = (int)stars; 
 												bool hasHalfStar = (stars - fullStars) >= 0.5;
 												int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
@@ -454,7 +454,7 @@
 							<div class="author-review">
 								@{
 									double rate2 = Model.TopTrailerSection[randomIndex].Rate;
-									double stars2 = rate2 / 2; 
+									double stars2 = rate2 ; 
 									int fullStars2 = (int)stars2;
 									bool hasHalfStar2 = (stars2 - fullStars2) >= 0.5;
 									int emptyStars2 = 5 - fullStars2 - (hasHalfStar2 ? 1 : 0);

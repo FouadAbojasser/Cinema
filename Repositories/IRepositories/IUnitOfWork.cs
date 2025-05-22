@@ -6,8 +6,9 @@
         IGenreRepository Genre { get; }
         IDirectorRepository Director { get; }
         IMovieRepository Movie { get; }
-        IReviewRepository Review { get; }
+        IReviewRepository MovieReviews { get; }
         IOTPRepository OTP { get; }
         IApplicationUserRepository ApplicationUser { get; }
+        IMovieRatesRepository MovieRates { get; }
     }
 }

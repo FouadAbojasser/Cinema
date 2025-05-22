@@ -27,8 +27,10 @@ namespace Cinema
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Theater> Theaters { get; set; }
         public DbSet<MovieTheater> MovieTheaters { get; set; }
-        public DbSet<Review> Reviews { get; set; }
+        public DbSet<MovieReviews> MovieReviews { get; set; }
+        public DbSet<MovieRates> MovieRates { get; set; }
         public DbSet<OTP> OTPs { get; set; }
+        
 
 
 
@@ -83,13 +85,13 @@ namespace Cinema
 
             modelBuilder.Entity<MovieTheater>()
             .HasOne(mt => mt.Movie)
-            .WithMany(m => m.MovieTheaters)
+            .WithMany(m => m.MovieTheater)
             .HasForeignKey(mt => mt.MovieId);
 
 
             modelBuilder.Entity<MovieTheater>()
             .HasOne(mt => mt.Theater)
-            .WithMany(t => t.MovieTheaters)
+            .WithMany(t => t.MovieTheater)
             .HasForeignKey(mt => mt.TheaterId);
         }
 

@@ -2,8 +2,7 @@
 
 namespace Cinema.Repositories.IRepositories
 {
-    public interface IReviewRepository : IRepository<MovieReviews>
+    public interface IMovieRatesRepository : IRepository<MovieRates>
     {
-
     }
 }

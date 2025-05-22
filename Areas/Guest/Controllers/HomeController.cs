@@ -152,10 +152,9 @@ public class HomeController : Controller
             .Include(e => e.Genres)
             .Include(e => e.Actors)
             .Include(e => e.Director)
-            .Include(e => e.MovieTheaters)
+            .Include(e => e.MovieTheater)
             .ThenInclude(mt => mt.Theater)
-            .Include(r => r.Reviews)
-            .ThenInclude(u=>u.applicationUser)); //Deep Include of Navigation Property Movie->Review->ApplicationUser
+            .Include(r => r.MovieReviews)); //Deep Include of Navigation Property Movie->Review->ApplicationUser
 
         if (movie == null)
         {
@@ -179,7 +178,7 @@ public class HomeController : Controller
             e => e.Id != id && e.Genres.Select(g => g.Id).Intersect(movieGenreIds).Count() >= 2,
             query => query
             .Include(e => e.Images)
-            .Include(e => e.MovieTheaters)
+            .Include(e => e.MovieTheater)
                 .ThenInclude(mt => mt.Theater)
 );
 
@@ -189,7 +188,7 @@ public class HomeController : Controller
 
             SimilarMovies = similarMovies.ToList(),
 
-            Reviews = movie.Reviews.ToList(),
+            MovieReviews = movie.MovieReviews.ToList(),
 
         };
 

@@ -1,7 +1,19 @@
 ﻿@using Cinema.Models.ViewModels
+@using System.Security.Claims
 @model MovieWithSimilarMoviesWithReviewsVM
 
 <style>
+	.theme-btn.disabled {
+	background-color: transparent;
+	cursor: not-allowed;
+	border:solid,1px,darkred
+	}
+
+	.theme-btn.active {
+	background-color: darkred; /* Red */
+	cursor: pointer;
+	color: white;
+	}
 
 	.review-header {
 	display: inline-flex;
@@ -78,11 +90,26 @@
 	}
 
 	.details-thumb a.disabled {
-		pointer-events: none;
-		opacity: 0.25;
-		cursor: default;
+	pointer-events: none;
+	opacity: 0.25;
+	cursor: default;
 	}
 
+
+	.star-rating {
+	display: inline-flex;
+	}
+
+	.star-rating i {
+	cursor: pointer;
+	color: gray;
+	font-size: 20px;
+	margin-right: 2px;
+	}
+
+	.star-rating i.gold {
+	color: gold;
+	}
 
 </style>
 
@@ -187,7 +214,7 @@
 									Cinema:
 								</div>
 								<div class="transformers-right">
-									@string.Join("  |  ", Model.Movie.MovieTheaters.Select(g => g.Theater?.Name))
+									@string.Join("  |  ", Model.Movie.MovieTheater.Select(g => g.Theater.Name))
 								</div>
 							</li>
 							<li>
@@ -195,7 +222,7 @@
 									Start Date:
 								</div>
 								<div class="transformers-right">
-									@string.Join("  |  ", Model.Movie.MovieTheaters.Select(g => g.StartDate))
+									@string.Join("  |  ", Model.Movie.MovieTheater.Select(g => g.StartDate))
 								</div>
 							</li>
 							<li>
@@ -203,14 +230,48 @@
 									End Date:
 								</div>
 								<div class="transformers-right">
-									@string.Join("  |  ", Model.Movie.MovieTheaters.Select(g => g.EndDate))
+									@string.Join("  |  ", Model.Movie.MovieTheater.Select(g => g.EndDate))
 								</div>
 							</li>
 							<li>
-								<div class="transformers-left mt-4">
+								<div class="transformers-left mt-2">
+									Rate:
+								</div>
+								<div class="transformers-right mt-2">
+
+									<div class="author-review">
+										@{
+											double rate = Model.Movie.Rate;
+											double stars = rate ;
+											int fullStars = (int)stars;
+											bool hasHalfStar = (stars - fullStars) >= 0.5;
+											int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+										}
+
+										@for (int i = 0; i < fullStars; i++)
+										{
+											<i class="icofont icofont-star" style="color: gold;"></i> <!-- Full star -->
+										}
+
+										@if (hasHalfStar)
+										{
+											<i class="icofont icofont-star" style="background: linear-gradient(90deg, gold 50%, gray 50%); -webkit-background-clip: text; color: transparent;"></i> <!-- Half star -->
+										}
+
+										@for (int i = 0; i < emptyStars; i++)
+										{
+											<i class="icofont icofont-star" style="color: gray;"></i> <!-- Empty star -->
+										}
+									</div>
+
+								</div>
+
+							</li>
+							<li>
+								<div class="transformers-left mt-2">
 									Share:
 								</div>
-								<div class="transformers-right mt-4">
+								<div class="transformers-right mt-2">
 									<a href="#"><i class="icofont icofont-social-facebook mx-1"></i></a>
 									<a href="#"><i class="icofont icofont-social-twitter mx-1"></i></a>
 									<a href="#"><i class="icofont icofont-social-google-plus mx-1"></i></a>
@@ -293,6 +354,147 @@
 </section>
 <!-- Movie Images slider section end -->
 
+<!-- Blog Area Starts -->
+<section class="blog-details">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="details-overview mt-30">
+					<!-- First Row: Reviews and Recent Comments -->
+					<div class="row">
+						<div class="col">
+							<div class="col-lg-12">
+								<div class="review-header">
+									<h2>Reviews</h2>
+									<a href="#"><i class="icofont icofont-comment"></i> @Model.MovieReviews?.Count Comments</a>
+								</div>
+								<partial name="_Comments" model="Model.MovieReviews" />
+							</div>
+							<!-- Navigation Buttons - Kept in original position -->
+							<div class="details-thumb">
+								<a id="prevBtn" href="#" class="details-thumb-prev">
+									<div class="thumb-icon">
+										<i class="icofont icofont-simple-left"></i>
+									</div>
+									<div class="thumb-text">
+										<h4>Previous Post</h4>
+									</div>
+								</a>
+								<a id="nextBtn" href="#" class="details-thumb-next">
+									<div class="thumb-text">
+										<h4>Next Post</h4>
+									</div>
+									<div class="thumb-icon">
+										<i class="icofont icofont-simple-right"></i>
+									</div>
+								</a>
+							</div>
+						</div>
+						<div class="col-lg-4">
+							<div class="blog-sidebar">
+								<h4>Recent Comments</h4>
+								<ul>
+									@if (Model.Movie.MovieReviews.Any())
+									{
+										@foreach (var review in Model.Movie.MovieReviews.OrderByDescending(e => e.CreatedAt).Take(5))
+										{
+											if (review.Comment?.Length < 20)
+											{
+												<li>@review.Comment</li>
+											}
+											else
+											{
+												<li>@review.Comment?.Substring(0, 20) ...</li>
+											}
+										}
+									}
+									else
+									{
+										<p> No recent comments.</p>
+									}
+								</ul>
+							</div>
+						</div>
+					</div>
+
+
+					
+					<!-- Second Row: Leave Comment and Rate Movie -->
+					
+					@if (User?.Identity != null && User.Identity.IsAuthenticated)
+					{
+						<script>
+							const ApplicationUserId = "@User.FindFirstValue(ClaimTypes.NameIdentifier)";
+						</script>
+
+						<div class="row" style="margin-top:40px">
+							<div class="col-lg-8">
+								<div class="details-reply">
+									
+									<h2>Leave a Review</h2>
+									<form action="/Identity/UserActivities/AddReview" method="post">
+										<input type="hidden" name="MovieId" value="@Model.Movie.Id" />
+										<input type="hidden" name="ApplicationUserName" value="@User.Identity.Name" />
+										<div class="row">
+											<div class="col-lg-12">
+												<div class="textarea-container">
+													<textarea id="commentText" placeholder="Type Comment Here ..." name="Comment"></textarea>
+												</div>
+											</div>
+										</div>
+										<div class="details-comment">
+											<button id="submitBtn" type="submit" class="theme-btn disabled" disabled>Post a Comment</button>
+										</div>
+									</form>
+
+								</div>
+							</div>
+
+
+							<div class="col-lg-4">
+							<form method="post" action="/Identity/UserActivities/UserMovieRates">
+									<input type="hidden" name="MovieId" id="MovieId" value="@Model.Movie.Id" />
+									<input type="hidden" name="ApplicationUserName" id="ApplicationUserName" value="@User.Identity.Name" />
+
+									<div class="blog-sidebar">
+										<h4>Rate This Movie</h4>
+										<ul style="list-style: none; padding-left: 0;">
+											<li style="display: flex; align-items: center; gap: 10px;">
+												Actors:
+												<div class="star-rating" data-category="actors"></div>
+												<input type="hidden" name="ActorsRate" id="ActorsRate">
+											</li>
+											<li style="display: flex; align-items: center; gap: 10px;">
+												Graphics:
+												<div class="star-rating" data-category="graphics"></div>
+												<input type="hidden" name="GraphicsRate" id="GraphicsRate">
+											</li>
+											<li style="display: flex; align-items: center; gap: 10px;">
+												Director:
+												<div class="star-rating" data-category="director"></div>
+												<input type="hidden" name="DirectorRate" id="DirectorRate">
+											</li>
+											<li style="display: flex; align-items: center; gap: 10px;">
+												Overall:
+												<div class="star-rating" data-category="overall"></div>
+												<input type="hidden" name="OverallRate" id="OverallRate">
+											</li>
+										</ul>
+									</div>
+									<div class="details-comment mt-2">
+										<button id="submitRateBtn" type="submit" class="theme-btn disabled" disabled>Submit Your Rates</button>
+									</div>
+							</form>								
+						</div>
+					</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- Blog Area Ends -->
+
 <!-- Similer Movies area start -->
 <section class="details-area">
 	<div class="container">
@@ -327,24 +529,24 @@
 										<div class="d-flex justify-content-center align-items-center mt-2">
 											<div class="author-review mx-2">
 												@{
-													double rate = movie.Rate;
-													double stars = rate / 2;
-													int fullStars = (int)stars;
-													bool hasHalfStar = (stars - fullStars) >= 0.5;
-													int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+													double rate_sim = movie.Rate;
+													double stars_sim = rate_sim ;
+													int fullStars_sim = (int)stars_sim;
+													bool hasHalfStar_sim = (stars_sim - fullStars_sim) >= 0.5;
+													int emptyStars_sim = 5 - fullStars_sim - (hasHalfStar_sim ? 1 : 0);
 												}
 
-												@for (int i = 0; i < fullStars; i++)
+												@for (int i = 0; i < fullStars_sim; i++)
 												{
 													<i class="icofont icofont-star" style="color: gold;"></i>
 												}
 
-												@if (hasHalfStar)
+												@if (hasHalfStar_sim)
 												{
 													<i class="icofont icofont-star" style="background: linear-gradient(90deg, gold 50%, gray 50%); -webkit-background-clip: text; color: transparent;"></i>
 												}
 
-												@for (int i = 0; i < emptyStars; i++)
+												@for (int i = 0; i < emptyStars_sim; i++)
 												{
 													<i class="icofont icofont-star" style="color: gray;"></i>
 												}
@@ -363,102 +565,39 @@
 </section>
 <!-- Similer Movies area end -->
 
-<!-- blog area start -->
-<section class="blog-details">
-	<div class="container">
-		<div class="row">
-			<div class="col-lg-9">
-				<div class="details-overview mt-30">
 
 
-
-					<div class="review-header">
-						<h2>Reviews</h2>
-						<a href="#"><i class="icofont icofont-comment"></i> @Model.Reviews?.Count Comments</a>
-					</div>
-
-					
-					<partial name="_Comments" model="Model.Reviews" />
-
-
-					<div class="details-thumb">
-						<a id="prevBtn" href="#" class="details-thumb-prev">
-							<div class="thumb-icon">
-								<i class="icofont icofont-simple-left"></i>
-							</div>
-							<div class="thumb-text">
-								<h4>Previous Post</h4>
-							</div>
-						</a>
-						<a id="nextBtn" href="#" class="details-thumb-next">
-							<div class="thumb-text">
-								<h4>Next Post</h4>
-							</div>
-							<div class="thumb-icon">
-								<i class="icofont icofont-simple-right"></i>
-							</div>
-						</a>
-					</div>
-
-
-
-
-					@if (User is not null & User!.Identity!.IsAuthenticated)
-					{
-						<div class="review-header">
-							<h2></h2>
-						</div>
-						
-						<div class="details-reply">
-							<h2>Leave a Comment</h2>
-
-							<form action="/Identity/UserActivities/AddReview" method="post">
-								<input type="hidden" name="MovieId" value="@Model.Movie.Id" />
-								<div class="row">
-									<div class="col-lg-12">
-										<div class="textarea-container">
-											<textarea placeholder="Type Here Message" name="Comment"></textarea>
-											<button><i class="icofont icofont-send-mail"></i></button>
-										</div>
-									</div>
-								</div>
-								<div class="details-comment">
-									<button id="submitBtn" type="submit" class="theme-btn">Post a Comment</button>
-								</div>
-							</form>
-
-						</div>
-						
-					}
-
-				</div>
-			</div>
-			<div class="col-lg-3">
-				<div class="blog-sidebar">
-					<h4>Recent Comments</h4>
-					<ul>
-						@foreach (var review in Model.Movie.Reviews.OrderByDescending(e=>e.CreatedAt).Take(5))
-						{
-
-							<li> @review.Comment</li>
-						}
-						
-					</ul>
-				</div>
-			</div>
-		</div>
-	</div>
-</section><!-- blog area end -->
 
 @section Scripts {
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+	@if (TempData["SingleMovie"] != null)
+{
 	<script>
-		// Initialize carousel
-		$(document).ready(function(){
-			$('.carousel').carousel();
+		Swal.fire({
+			position: "center",
+			icon: "success",
+				title: "@TempData["SingleMovie"]",
+			showConfirmButton: false,
+			timer: 2000,
+			background: "#1e1e1e", // dark background
+			color: "#ffffff", // white text
+			iconColor: "#00ff00" // optional: change icon color for dark mode
 		});
 	</script>
-
 }
+
+
+
+<script>
+	// Initialize carousel
+	$(document).ready(function(){
+		$('.carousel').carousel();
+	});
+</script>
+
+
 <script>
 	document.addEventListener("DOMContentLoaded", function () {
 		let currentIndex = 0;
@@ -494,6 +633,85 @@
 
 		showReview(currentIndex); // Initial check
 	});
+</script>
 
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+	  const categories = ['actors', 'graphics', 'director', 'overall'];
+
+	  categories.forEach(category => {
+		const container = document.querySelector(`.star-rating[data-category="${category}"]`);
+		const hiddenInput = document.getElementById(`${capitalize(category)}Rate`);
+
+		for (let i = 1; i <= 5; i++) {
+		  const star = document.createElement('i');
+		  star.className = 'icofont icofont-star';
+		  star.dataset.value = i;
+
+		  star.addEventListener('click', function () {
+			const value = parseInt(this.dataset.value);
+			updateStars(container, value);
+			hiddenInput.value = value;
+			enableSubmitIfReady();
+		  });
+
+		  container.appendChild(star);
+		}
+	  });
+
+	  function updateStars(container, value) {
+		const stars = container.querySelectorAll('i');
+		stars.forEach((star, index) => {
+		  star.classList.toggle('gold', index < value);
+		});
+	  }
+
+	  function capitalize(str) {
+		return str.charAt(0).toUpperCase() + str.slice(1);
+	  }
+
+	  function enableSubmitIfReady() {
+		// Enable submit if any rating has a value > 0
+		const submitBtn = document.getElementById('submitRateBtn');
+		const anyRated = categories.some(cat => {
+		  const input = document.getElementById(`${capitalize(cat)}Rate`);
+		  return input.value && input.value > 0;
+		});
+		if (anyRated) {
+		  submitBtn.disabled = false;
+		  submitBtn.classList.remove('disabled');
+		  submitBtn.classList.add('active');
+		} else {
+		  submitBtn.disabled = true;
+		  submitBtn.classList.remove('active');
+		  submitBtn.classList.add('disabled');
+		}
+	  }
+	});
 
 </script>
+
+
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		const textarea = document.getElementById('commentText');
+		const submitBtn = document.getElementById('submitBtn');
+
+		textarea.addEventListener('input', function () {
+			const hasText = textarea.value.trim().length > 0;
+			submitBtn.disabled = !hasText;
+
+			if (hasText) {
+				submitBtn.classList.remove('disabled');
+				submitBtn.classList.add('active');
+			} else {
+				submitBtn.classList.remove('active');
+				submitBtn.classList.add('disabled');
+			}
+		});
+	});
+</script>
+
+
+}

@@ -45,31 +45,66 @@ namespace Cinema.Areas.Identity.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> AddReviewAsync(AddReviewVM reviewVM)
+        public async Task<IActionResult> AddReviewAsync(MovieReviews review)
         {
-            var user = await _userManager.GetUserAsync(User);
-            var movie =  _unitOfWork.Movie.GetOne(e => e.Id == reviewVM.MovieId,null,false);
-
-            if (user == null || movie == null)
+            var UserReview = _unitOfWork.MovieReviews.GetOne(e => e.MovieId == review.MovieId && e.ApplicationUserName == review.ApplicationUserName);
+            if (UserReview is null)
             {
-                return NotFound();
+                //New Comment to be Added
+                review.CreatedAt = DateTime.UtcNow;
+                await _unitOfWork.MovieReviews.CreateAsync(review);
+                await _unitOfWork.MovieReviews.CommitAsync();
+                TempData["SingleMovie"] = "Yor Comment has been Recorded!";
+            }
+            else
+            {
+                //Update Old Comment
+                UserReview.Comment= review.Comment;
+                review.CreatedAt = DateTime.UtcNow;
+                _unitOfWork.MovieReviews.Update(UserReview);
+                await _unitOfWork.MovieReviews.CommitAsync();
+                TempData["SingleMovie"] = "Yor Comment has been Updated!";
             }
 
-            var userReview = new Review()
+            return RedirectToAction("MovieDetails", "Home", new { area = "Guest", id = review.MovieId });
+
+
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> UserMovieRatesAsync(MovieRates movieRates)
+        {
+            var UserRateForThisMovie = _unitOfWork.MovieRates.GetOne(e => e.ApplicationUserName == movieRates.ApplicationUserName && e.MovieId == movieRates.MovieId);
+            if(UserRateForThisMovie is null)
             {
-                Comment = reviewVM.Comment,
-                UserRate = reviewVM.UserRate,
-                CreatedAt = DateTime.Now,
-                applicationUser = user,
-                Movie = movie,
-                
-                
-            };
+                //New Rate to be Added
+                await _unitOfWork.MovieRates.CreateAsync(movieRates);
+                await _unitOfWork.MovieRates.CommitAsync();
+                TempData["SingleMovie"] = "Yor Rate has been Recorded";
+            }
+            else
+            {
+                //user Rate Already Exist, Update it
+                UserRateForThisMovie.ActorsRate = movieRates.ActorsRate;
+                UserRateForThisMovie.DirectorRate = movieRates.DirectorRate;
+                UserRateForThisMovie.GraphicsRate = movieRates.GraphicsRate;
+                UserRateForThisMovie.OverallRate = movieRates.OverallRate;
+                _unitOfWork.MovieRates.Update(UserRateForThisMovie);
+                await _unitOfWork.MovieRates.CommitAsync();
+                TempData["SingleMovie"] = "Yor Rate has been Updated";
 
-            await _unitOfWork.Review.CreateAsync(userReview);
-            await _unitOfWork.Review.CommitAsync();
+            }
 
-            return RedirectToAction("MovieDetails", "Home", new { area = "Guest", id = movie.Id });
+            //Update Movie Rate
+            var MovieRates = _unitOfWork.MovieRates.Get(e => e.MovieId == movieRates.MovieId).Select(e=>e.OverallRate);
+            var AverageRateOfMovie = Math.Round((double)MovieRates.Average()!, 1);
+            var MovieToUpdateRate = _unitOfWork.Movie.GetOne(m=>m.Id== movieRates.MovieId);
+            MovieToUpdateRate!.Rate = (double)AverageRateOfMovie!;
+            _unitOfWork.Movie.Update(MovieToUpdateRate);
+            await _unitOfWork.Movie.CommitAsync();
+
+            return RedirectToAction("MovieDetails", "Home", new { area = "Guest", Id = movieRates.MovieId });
         }
 
 

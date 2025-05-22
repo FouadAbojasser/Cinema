@@ -5,11 +5,21 @@
         <div class="review-item" data-index="@i" style="display: @(i == 0 ? "block" : "none")">
             <div class="review-author">
                 <h6 style="color:darkcyan; margin-bottom:10px">
-                    By: @review.applicationUser!.UserName &nbsp;&nbsp; at: @review.CreatedAt?.ToString("MMMM dd, yyyy")
+                    By: @review.ApplicationUserName &nbsp;&nbsp; at: @review.CreatedAt?.ToString("MMMM dd, yyyy")
                 </h6>
             </div>
             <div class="review-content">
-                <p>@review.Comment</p>
+                @{
+                    if (review.Comment?.Length < 200)
+                    {
+                        <p>@review.Comment</p>
+                    }
+                    else
+                    {
+                        <p>@review.Comment?.Substring(0, 200) ...</p>
+                    }
+                }
+                
             </div>
         </div>
     }

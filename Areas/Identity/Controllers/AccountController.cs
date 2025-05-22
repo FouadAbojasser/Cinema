@@ -260,20 +260,16 @@ namespace Cinema.Areas.Identity.Controllers
             }
             else
             {
-                if(resetPasswordRequestVM.ResetMethod == "OTP")
+                if (resetPasswordRequestVM.ResetMethod == "OTP")
                 {
+                    var userLastOTP = _unitOfWork.OTP.Get(e => e.ApplicationUserId == applicationUser.Id).LastOrDefault();
 
-                    //Using OTP
-                    int GenOTP = new Random().Next(1000, 9999);
-
-                    //Needed for ResetPassword
-                    string token = await _userManager.GeneratePasswordResetTokenAsync(applicationUser);
-
-                    var userLastOTP = _unitOfWork.OTP.Get(e=>e.ApplicationUserId==applicationUser.Id).LastOrDefault();
-
-                    if ((DateTime.UtcNow - userLastOTP!.RequestDateTime).TotalMinutes > 30)
+                    if (userLastOTP is null)
                     {
-
+                        //User Has never User OTP
+                        int GenOTP = new Random().Next(1000, 9999);
+                        //Needed for ResetPassword
+                        string token = await _userManager.GeneratePasswordResetTokenAsync(applicationUser);
                         //Add OTP to Database
                         await _unitOfWork.OTP.CreateAsync(new OTP()
                         {
@@ -284,9 +280,7 @@ namespace Cinema.Areas.Identity.Controllers
                             UsedByUser = false
 
                         });
-
                         await _unitOfWork.OTP.CommitAsync();
-
                         //Generating HTML OTP Message
                         string templatePathOTP = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email-templates", "PasswordResetOTP.html");
                         string emailBodyOTP = await System.IO.File.ReadAllTextAsync(templatePathOTP);
@@ -302,18 +296,50 @@ namespace Cinema.Areas.Identity.Controllers
 
                         return RedirectToAction("NewPasswordOTP", "Account", new { area = "Identity", Token = token, ApplicationUserId = applicationUser.Id });
                     }
-                    else
-                    {
-                        var timeSinceLastOTP = DateTime.UtcNow - userLastOTP.RequestDateTime;
 
-                        var remainingTime = TimeSpan.FromMinutes(30) - timeSinceLastOTP;
+                    else if ((DateTime.UtcNow - userLastOTP.RequestDateTime).TotalMinutes > 30)
+                    {
+                        //User Has never User OTP
+                        int GenOTP = new Random().Next(1000, 9999);
+                        //Needed for ResetPassword
+                        string token = await _userManager.GeneratePasswordResetTokenAsync(applicationUser);
+                        //Add OTP to Database
+                        await _unitOfWork.OTP.CreateAsync(new OTP()
+                        {
+                            OTP_Number = GenOTP,
+                            ApplicationUserId = applicationUser.Id,
+                            RequestDateTime = DateTime.UtcNow,
+                            ExpairationDateTime = DateTime.UtcNow.AddMinutes(30),
+                            UsedByUser = false
+
+                        });
+                        await _unitOfWork.OTP.CommitAsync();
+                        //Generating HTML OTP Message
+                        string templatePathOTP = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email-templates", "PasswordResetOTP.html");
+                        string emailBodyOTP = await System.IO.File.ReadAllTextAsync(templatePathOTP);
+                        emailBodyOTP = emailBodyOTP.Replace("{{UserName}}", applicationUser.UserName)
+                                             .Replace("{{YourOTP}}", GenOTP.ToString());
+
+                        //Sending Confirmation Email
+                        await _emailSender.SendEmailAsync(applicationUser.Email!, "Reset Password Email", emailBodyOTP);
+
+                        TempData["Notification"] = "Password Reset has been requested successfully!";
+
+                        TempData["_validationToken"] = Guid.NewGuid().ToString();
+
+                        return RedirectToAction("NewPasswordOTP", "Account", new { area = "Identity", Token = token, ApplicationUserId = applicationUser.Id });
+
+                    }
+
+                    else if ((DateTime.UtcNow - userLastOTP!.RequestDateTime).TotalMinutes < 30)
+                    {
+
+                        var remainingTime = TimeSpan.FromMinutes(30) - (DateTime.UtcNow - userLastOTP!.RequestDateTime);
 
                         ModelState.AddModelError(string.Empty, $"You can use OTP after {remainingTime.ToString("mm\\:ss")} minutes!");
-                        
+
                         return View(resetPasswordRequestVM);
-                        
                     }
-                    
                 }
 
                 else if (resetPasswordRequestVM.ResetMethod == "ConfirmationLink")
@@ -340,10 +366,11 @@ namespace Cinema.Areas.Identity.Controllers
 
                 }
 
-                return View(nameof(CheckInbox));
+                    return View(nameof(CheckInbox));
 
+                }
             }
-        }
+        
 
         public IActionResult CheckInbox()
         {
