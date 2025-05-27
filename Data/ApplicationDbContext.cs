@@ -30,6 +30,7 @@ namespace Cinema
         public DbSet<MovieReviews> MovieReviews { get; set; }
         public DbSet<MovieRates> MovieRates { get; set; }
         public DbSet<OTP> OTPs { get; set; }
+        public DbSet<ShowTime> ShowTimes { get; set; }
         
 
 
@@ -65,14 +66,13 @@ namespace Cinema
              .HasMany(t => t.Actors)
              .WithMany(t => t.Movies);
              
+            modelBuilder.Entity<Director>()
+            .HasMany(e => e.Movies)
+            .WithOne(e => e.Director);
 
             modelBuilder.Entity<Series>()
             .HasMany(t => t.Actors)
             .WithMany(t => t.Series);
-
-            modelBuilder.Entity<Director>()
-            .HasMany(e => e.Movies)
-            .WithOne(e => e.Director);
 
             modelBuilder.Entity<Director>()
             .HasMany(e => e.Series)
@@ -82,17 +82,21 @@ namespace Cinema
             modelBuilder.Entity<MovieTheater>()
              .HasKey(mt => new { mt.MovieId, mt.TheaterId }); // Composite Primary Key
 
+            modelBuilder.Entity<MovieTheater>()
+               .HasOne(mt => mt.Movie)
+               .WithMany(m => m.MovieTheater)
+               .HasForeignKey(mt => mt.MovieId);
 
             modelBuilder.Entity<MovieTheater>()
-            .HasOne(mt => mt.Movie)
-            .WithMany(m => m.MovieTheater)
-            .HasForeignKey(mt => mt.MovieId);
+                .HasOne(mt => mt.Theater)
+                .WithMany(t => t.MovieTheater)
+                .HasForeignKey(mt => mt.TheaterId);
 
-
-            modelBuilder.Entity<MovieTheater>()
-            .HasOne(mt => mt.Theater)
-            .WithMany(t => t.MovieTheater)
-            .HasForeignKey(mt => mt.TheaterId);
+            // One-to-many: MovieTheater ↔ ShowTime
+            modelBuilder.Entity<ShowTime>()
+                .HasOne(st => st.MovieTheater)
+                .WithMany(mt => mt.ShowTimes)
+                .HasForeignKey(st => new { st.MovieId, st.TheaterId });
         }
 
     }

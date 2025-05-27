@@ -31,6 +31,7 @@
 	  <Folder Include="Areas\Identity\Models\" />
 	  <Folder Include="wwwroot\img\cast\avatar\" />
 	  <Folder Include="wwwroot\img\genres\" />
+	  <Folder Include="wwwroot\img\users\" />
 	  <Folder Include="wwwroot\img\posters\" />
 	</ItemGroup>
 

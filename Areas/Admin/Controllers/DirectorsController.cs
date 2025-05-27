@@ -1,4 +1,5 @@
-﻿using Cinema.Models;
+﻿using System.Threading.Tasks;
+using Cinema.Models;
 using Cinema.Repositories.IRepositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +41,7 @@ namespace Cinema.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Director director, IFormFile Img)
+        public async Task<IActionResult> Create(Director director, IFormFile Img)
         {
             if (director != null && Img != null && Img.Length > 0)
             {
@@ -73,9 +74,9 @@ namespace Cinema.Areas.Admin.Controllers
                 // Save the image name to the database
                 director.Img = fileName;
 
-                _unitOfWork.Director.CreateAsync(director);
+               await _unitOfWork.Director.CreateAsync(director);
 
-                _unitOfWork.Director.CommitAsync();
+               await _unitOfWork.Director.CommitAsync();
 
                 TempData["SuccessMessage"] = "Created successfully";
 
@@ -100,7 +101,7 @@ namespace Cinema.Areas.Admin.Controllers
 
 
         [HttpPost]
-        public IActionResult Edit(Director director, IFormFile Img)
+        public async Task<IActionResult> EditAsync(Director director, IFormFile Img)
         {
             var oldDirectorInDB = _unitOfWork.Director.GetOne(e => e.Id == director.Id,null,true);
 
@@ -156,7 +157,7 @@ namespace Cinema.Areas.Admin.Controllers
 
                 _unitOfWork.Director.Update(director);
 
-                _unitOfWork.Director.CommitAsync();
+                await _unitOfWork.Director.CommitAsync();
 
                 TempData["SuccessMessage"] = "Edited successfully";
 
@@ -168,7 +169,7 @@ namespace Cinema.Areas.Admin.Controllers
 
 
 
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
             var director = _unitOfWork.Director.GetOne(e=>e.Id == id);
 
@@ -195,7 +196,7 @@ namespace Cinema.Areas.Admin.Controllers
 
                 _unitOfWork.Director.Delete(director);
 
-                _unitOfWork.Director.CommitAsync();
+               await _unitOfWork.Director.CommitAsync();
 
             }
             else

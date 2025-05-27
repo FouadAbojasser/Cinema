@@ -224,6 +224,7 @@ public class HomeController : Controller
 
     public IActionResult Movies()
     {
+       
         var movies = _unitOfWork.Movie.Get(null, [e => e.Genres, e => e.Images]);
           
         var geners = _unitOfWork.Genre.Get();
@@ -233,20 +234,37 @@ public class HomeController : Controller
             Movies = movies.ToList(),
             Genres = geners.ToList(),
         };
-
         return View(moviesWithGeners);
+       
     }
 
-    //public IActionResult _Comments(int MovieId, int skip = 0)
-    //{
-    //    var OneReviewAtATime = _reviewRepository
-    //        .Get(m => m.Movie!.Id == MovieId, [u=>u.applicationUser!])
-    //        .Skip(skip)
-    //        .Take(1)
-    //        .ToList();
 
-    //    return PartialView("_Comment", OneReviewAtATime);
-    //}
+   public IActionResult Search (string searchText, string searchTable)
+    {
+        if (searchText != null && searchTable != null)
+        {
+            if (searchTable == "Cinema")
+            {
+
+            }
+            if (searchTable == "Movie")
+            {
+                var resultedMovies = _unitOfWork.Movie.Get(e => e.Title.Contains(searchText), [e=>e.Genres, e=>e.Images]);
+                var geners = _unitOfWork.Genre.Get();
+
+                var moviesWithGenersAfterSearch = new MoviesWithGenresVM
+                {
+                    Movies = resultedMovies.ToList(),
+                    Genres = geners.ToList(),
+                };
+
+                return View(moviesWithGenersAfterSearch);
+            }
+        }
+
+        return RedirectToAction(nameof(Index));
+
+    }
 
 
 

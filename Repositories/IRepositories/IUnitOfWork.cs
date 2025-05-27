@@ -10,5 +10,9 @@
         IOTPRepository OTP { get; }
         IApplicationUserRepository ApplicationUser { get; }
         IMovieRatesRepository MovieRates { get; }
+        ITheaterRepository Theater { get; }
+        IShowTimeRepository ShowTime { get; }
+        IMovieTheaterRepository MovieTheater { get; }
+        
     }
 }

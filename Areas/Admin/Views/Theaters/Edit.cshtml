@@ -1,0 +1,47 @@
+﻿@model Theater
+
+<div class="col-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Edit Theater</h4>
+
+            <form id="myForm" class="forms-sample" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Rate" />
+                <div class="form-group">
+                    <input type="text" class="form-control" asp-for="Name" placeholder="Theater Name">
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div> 
+
+                <div class="form-group">
+                    <input type="text" class="form-control" asp-for="Address" placeholder="Theater Address">
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input type="number" class="form-control" asp-for="Seats" placeholder="No. of Seats">
+                    <span asp-validation-for="Seats" class="text-danger"></span>
+                </div>
+
+                <button id="submitBtn" type="submit" class="btn btn-primary mr-2">Submit</button>
+                <a href="/Admin/Theaters" class="btn btn-light">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const form = document.getElementById("myForm");
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            if ($(form).valid())
+            {
+                form.submit();
+            }
+        });
+    </script>
+}

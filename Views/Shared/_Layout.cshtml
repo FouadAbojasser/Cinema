@@ -5,6 +5,9 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Cinema</title>
+
+	<!-- Cinema CSS -->
+	<link rel="stylesheet" type="text/css" href="~/css/cinema.css">
 	<!-- Favicon Icon -->
 	<link rel="icon" type="image/png" href="~/img/favcion.png" />
 	<!-- Bootstrap CSS -->
@@ -36,14 +39,17 @@
 					<a href="/"><img src="~/img/logo.png" alt="logo" /></a>
 				</div>
 				<div class="header-right">
-					<form action="#">
-						<select>
-							<option value="Movies">Movies</option>
-							<option value="TV Series">TV Series</option>
-							<option value="Documentry">Documentry</option>
+					<form action="/Guest/Home/Search" method="post">
+						<select name="searchTable">
+							<option value="Movie">Movies</option>
+							<option value="Cinema">Cinemas</option>
 						</select>
-						<input type="text" />
-						<button><i class="icofont icofont-search"></i></button>
+
+						<input type="text" name="searchText" id="searchText" oninput="toggleSearchButton()" />
+
+						<button type="submit" id="searchButton" style="display: none;">
+							<i class="icofont icofont-search"></i>
+						</button>
 					</form>
 					<ul>
 						@{
@@ -55,12 +61,12 @@
 							}
 							else
 							{
-								<li><a href="#">Welcome Guest!</a></li>
+								<li><a >Welcome Guest!</a></li>
 								<li><a href="/Identity/Account/Login">Login</a></li>
 								<li><a href="/Identity/Account/Register">Register</a></li>
 							}
 						}
-						
+
 					</ul>
 				</div>
 				<div class="menu-area">
@@ -72,17 +78,29 @@
 								var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 							}
 							<li><a class="@(currentController == "Home" && currentAction == "Index" ? "active" : "")" href="/">Home</a></li>
-							<li><a class="@(currentController == "Home" && currentAction == "Movies" ? "active" : "")" href="/Guest/Home/Movies">Movies</a></li>
-							@* <li><a class="@(currentAction == "TVSeries" ? "active" : "")" href="/Home/TVSeries">TV Series</a></li> *@
-							<li><a class="@(currentAction == "Actors" ? "active" : "")" href="/Home/Actors">Actors List</a></li>
-							<li><a class="" href="/Admin/Home/Index">Admin</a></li>
 							<li>
-								<a href="#">Pages <i class="icofont icofont-simple-down"></i></a>
+								<a class="@(currentController == "Cinema" && currentAction == "Index" ? "active" : "")" href="#">Cinemas<i class="icofont icofont-simple-down"></i></a>
 								<ul>
-									<li><a href="blog-details.html">Blog Details</a></li>
-									<li><a href="/Home/MovieDetails">Movie Details</a></li>
+									<li><a href="/Guest/Cinema/Index">Play Max</a></li>
+									<li><a href="#">Cinema 2</a></li>
 								</ul>
 							</li>
+							<li><a class="@(currentController == "Home" && currentAction == "Movies" ? "active" : "")" href="/Guest/Home/Movies">Movies</a></li>
+							@{
+								if (User!.IsInRole(SD.SuperAdmin))
+								{
+									<li><a class="" href="/Admin/Home/Index">Admin</a></li>
+								}
+							}
+							@* <li><a class="@(currentAction == "TVSeries" ? "active" : "")" href="/Home/TVSeries">TV Series</a></li> *@
+							@* <li><a class="@(currentAction == "Actors" ? "active" : "")" href="/Home/Actors">Actors List</a></li> *@
+							@* <li> *@
+							@* 	<a href="#">Pages <i class="icofont icofont-simple-down"></i></a> *@
+							@* 	<ul> *@
+							@* 		<li><a href="blog-details.html">Blog Details</a></li> *@
+							@* 		<li><a href="/Home/MovieDetails">Movie Details</a></li> *@
+							@* 	</ul> *@
+							@* </li> *@
 							@if (User?.Identity != null && User.Identity.IsAuthenticated)
 							{
 								<li><a class="theme-btn" href="#"><i class="icofont icofont-ticket"></i> Tickets</a></li>
@@ -353,7 +371,7 @@
 		</div>
 	</div><!-- header section end -->
 
-    <main role="main" class="pb-3">
+    <main role="main" class="pb-0">
         @RenderBody()
     </main>
 
@@ -428,7 +446,18 @@
 	<script src="~/js/jquery.magnific-popup.min.js"></script>
 	<script src="~/js/isotope.pkgd.min.js"></script>
 	<script src="~/js/main.js"></script>
+	<script>
+		function toggleSearchButton() {
+			const input = document.getElementById('searchText');
+			const button = document.getElementById('searchButton');
 
+			if (input.value.length > 2) {
+				button.style.display = 'inline-block';
+			} else {
+				button.style.display = 'none';
+			}
+		}
+	</script>
     @await RenderSectionAsync("Scripts", required: false)
 
 

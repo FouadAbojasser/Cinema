@@ -1,4 +1,5 @@
-﻿@model Dictionary<ApplicationUser, string>
+﻿@using Cinema.Models.ViewModels
+@model IEnumerable<ApplicationUserVM>
 
 <div class="row">
 	<div class="col-md-12">
@@ -7,7 +8,7 @@
 				<table class="table table-striped project-orders-table">
 					<thead>
 						<tr>
-							<th class="ml-5">ID</th>
+							<th class="ml-5">No.</th>
 							<th>Image</th>
 							<th>User Name</th>
 							<th>Date of Birth</th>
@@ -19,36 +20,38 @@
 					</thead>
 					<tbody>
 						@{
-
 							int count = 1;
 						}
-						@foreach (var item in Model)
+						@foreach (var userVM in Model)
 						{
 							<tr>
 								<td>@(count++)</td>
 								<td class="py-1">
-									<img src="~/img/users/avatar/@item" alt="image"
-										 style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" />
+									<img src="~/img/users/@userVM.ApplicationUser.Image" alt="image"
+									style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" />
 								</td>
-								<td>@item.Key.UserName</td>
-								<td>@item.Key.DoB.ToString("dd-MMM-yyyy")</td>
-								<td>@item.Key.Email</td>
-								<td>@item.Key.EmailConfirmed</td>
-								<td>@item.Value.ToString()</td>
+								<td align="center">@userVM.ApplicationUser.UserName</td>
+								<td align="center">@userVM.ApplicationUser.DoB.ToString("dd-MMM-yyyy")</td>
+								<td>@userVM.ApplicationUser.Email</td>
+								<td align="center">@userVM.ApplicationUser.EmailConfirmed</td>
 								<td>
-
+									@foreach (var role in @userVM.UserRoles)
+									{
+										<p>@role</p>
+									}
+								</td>
+								<td>
 									<div class="d-flex align-items-center">
-										<a href="/Admin/Actors/Edit/@item.Key.Id" class="btn btn-success btn-sm btn-icon-text mr-3">
+										<a href="/Admin/Users/Edit/@userVM.ApplicationUser.Id" class="btn btn-success btn-sm btn-icon-text mr-3">
 											Edit
 											<i class="typcn typcn-edit btn-icon-append"></i>
 										</a>
 
-										<a href="javascript:void(0);" onclick="confirmDelete(@item.Key.Id)" class="btn btn-danger btn-sm btn-icon-text">
+										<a href="javascript:void(0);" onclick="confirmDelete('@userVM.ApplicationUser.Id')" class="btn btn-danger btn-sm btn-icon-text">
 											Delete
 											<i class="typcn typcn-delete-outline btn-icon-append"></i>
 										</a>
 									</div>
-
 								</td>
 							</tr>
 						}
@@ -60,14 +63,14 @@
 </div>
 
 <!-- partial:partials/_settings-panel.html -->
-<a id="settings-trigger" href="/Admin/Actors/Create">
-	<h5 style="color: aliceblue; vertical-align:central; margin:0px">+</h5>
-</a>
+@* <a id="settings-trigger" href="/Admin/Users/Create"> *@
+@* 	<h5 style="color: aliceblue; vertical-align:central; margin:0px">+</h5> *@
+@* </a> *@
 
 <script>
 	function confirmDelete(id) {
 		Swal.fire({
-			title: "Are you sure you want to delete this Actor?",
+			title: "Are you sure you want to delete this user?",
 			text: "You won't be able to revert this!",
 			icon: "warning",
 			showCancelButton: true,
@@ -76,14 +79,14 @@
 			confirmButtonText: "Yes, delete it!"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				// Redirect to delete action
 				setTimeout(() => {
-					window.location.href = `/Admin/Actors/Delete/${item.Key.id`;
-				}, 1500); // Wait for the alert to finish
+					window.location.href = `/Admin/Users/Delete/${id}`;
+				}, 1500);
 			}
 		});
 	}
 </script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

@@ -4,6 +4,7 @@ using Cinema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cinema.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250526141527_AddApplicationUserImg")]
+    partial class AddApplicationUserImg
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,10 +148,6 @@ namespace Cinema.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("UserRoles")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -346,9 +345,6 @@ namespace Cinema.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("ApplicationUserName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -364,8 +360,6 @@ namespace Cinema.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("MovieId");
 
@@ -758,10 +752,6 @@ namespace Cinema.Migrations
 
             modelBuilder.Entity("Cinema.Models.MovieReviews", b =>
                 {
-                    b.HasOne("Cinema.Models.ApplicationUser", null)
-                        .WithMany("movieReviews")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("Cinema.Models.Movie", "Movie")
                         .WithMany("MovieReviews")
                         .HasForeignKey("MovieId")
@@ -900,11 +890,6 @@ namespace Cinema.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Cinema.Models.ApplicationUser", b =>
-                {
-                    b.Navigation("movieReviews");
                 });
 
             modelBuilder.Entity("Cinema.Models.Director", b =>

@@ -34,7 +34,7 @@ namespace Cinema.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Genre genre, IFormFile Img)
+        public async Task<IActionResult> CreateAsync(Genre genre, IFormFile Img)
         {
             if (genre != null && Img != null && Img.Length > 0)
             {
@@ -67,9 +67,9 @@ namespace Cinema.Areas.Admin.Controllers
                 // Save the image name to the database
                 genre.Img = fileName;
 
-                _unitOfWork.Genre.CreateAsync(genre);
+                await _unitOfWork.Genre.CreateAsync(genre);
 
-                _unitOfWork.Genre.CommitAsync();
+                await _unitOfWork.Genre.CommitAsync();
 
                 TempData["SuccessMessage"] = "Created successfully";
 
@@ -93,7 +93,7 @@ namespace Cinema.Areas.Admin.Controllers
 
 
         [HttpPost]
-        public IActionResult Edit(Genre genre, IFormFile Img)
+        public async Task<IActionResult> EditAsync(Genre genre, IFormFile Img)
         {
             var oldGenreInDB = _unitOfWork.Genre.GetOne(e => e.Id == genre.Id);
 
@@ -150,7 +150,7 @@ namespace Cinema.Areas.Admin.Controllers
 
                 _unitOfWork.Genre.Update(genre);
 
-                _unitOfWork.Genre.CommitAsync();
+                await _unitOfWork.Genre.CommitAsync();
 
                 TempData["SuccessMessage"] = "Edited successfully";
 
@@ -162,7 +162,7 @@ namespace Cinema.Areas.Admin.Controllers
 
 
 
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
             var genre = _unitOfWork.Genre.GetOne(g => g.Id == id, [m => m.Movies]);
 
@@ -194,7 +194,7 @@ namespace Cinema.Areas.Admin.Controllers
 
             _unitOfWork.Genre.Delete(genre);
 
-            _unitOfWork.Genre.CommitAsync();
+            await _unitOfWork.Genre.CommitAsync();
 
             TempData["SuccessMessage"] = "Deleted successfully";
 

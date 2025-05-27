@@ -47,6 +47,7 @@ namespace Cinema.Areas.Identity.Controllers
             {
                await _roleManager.CreateAsync(new IdentityRole(SD.SuperAdmin));
                await _roleManager.CreateAsync(new IdentityRole(SD.Admin));
+               await _roleManager.CreateAsync(new IdentityRole(SD.Producer));
                await _roleManager.CreateAsync(new IdentityRole(SD.Cinema));
                await _roleManager.CreateAsync(new IdentityRole(SD.Customer));
             }

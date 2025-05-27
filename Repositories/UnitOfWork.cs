@@ -13,7 +13,9 @@ namespace Cinema.Repositories
         public IOTPRepository OTP { get; private set; }
         public IApplicationUserRepository ApplicationUser { get; private set; }
         public IMovieRatesRepository MovieRates { get; private set; }
-
+        public ITheaterRepository Theater { get; private set; }
+        public IShowTimeRepository ShowTime {  get; private set; }
+        public IMovieTheaterRepository MovieTheater { get; private set; }
         public UnitOfWork(ApplicationDbContext dbContext)
         {
             _dbcontext = dbContext;
@@ -25,6 +27,9 @@ namespace Cinema.Repositories
             OTP = new OTPRepository(_dbcontext);
             ApplicationUser = new ApplicationUserRepository(_dbcontext);
             MovieRates = new MovieRatesRepositorycs(_dbcontext);
+            Theater = new TheaterRepository(_dbcontext);
+            ShowTime = new ShowTimeRepository(_dbcontext);
+            MovieTheater = new MovieTheaterRepository(_dbcontext);
         }
       
     }

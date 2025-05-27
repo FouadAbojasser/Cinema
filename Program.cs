@@ -50,6 +50,12 @@ namespace Cinema
 
             builder.Services.AddDbContext<ApplicationDbContext>();
 
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Identity/Account/Login";
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied"; // Optional
+            });
+
             //builder.Services.AddScoped<IActorRepository, ActorRepository>();
             //builder.Services.AddScoped<IDirectorRepository, DirectorRepository>();
             //builder.Services.AddScoped<IGenreRepository, GenreRepository>();

@@ -1,0 +1,107 @@
+﻿@using Cinema.Models.ViewModels
+@model ApplicationUserVM
+
+<div class="col-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Edit User</h4>
+
+            <form id="myForm" class="forms-sample" method="post" enctype="multipart/form-data">
+
+                <div class="form-group">
+                    <input type="hidden" class="form-control" asp-for="@Model.ApplicationUser.Id">
+                </div>
+
+                <div class="form-group">
+                    <input type="text" readonly class="form-control" asp-for="@Model.ApplicationUser.UserName" placeholder="User Name">
+                    <span asp-validation-for="@Model.ApplicationUser.UserName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input type="date" readonly class="form-control" asp-for="@Model.ApplicationUser.DoB" placeholder="Date of Birth">
+                    <span asp-validation-for="@Model.ApplicationUser.DoB" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input type="email" readonly class="form-control" asp-for="@Model.ApplicationUser.Email" placeholder="User Email">
+                    <span asp-validation-for="@Model.ApplicationUser.Email" class="text-danger"></span>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="form-label">User Roles</label>
+                    <div>
+                        @foreach (var role in Model.AvailableRoles)
+                        {
+                            var isChecked = Model.UserRoles.Contains(role) ? "checked" : "";
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                    <input type="checkbox"
+                                           class="form-check-input"
+                                           name="AvailableRoles"
+                                           value="@role"
+                                           required
+                                    @isChecked />
+                                    @role
+                                </label>
+                            </div>
+                        }
+                    </div>
+                    <span asp-validation-for="@Model.UserRoles" class="text-danger"></span>
+                </div>
+
+
+
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Current Image</label>
+
+                    <div class="col-sm-2">
+                        <img id="imagePreview"
+                             src="@Url.Content("~/img/users/" + Model.ApplicationUser.Image)"
+                             alt="User Image"
+                             class="img-thumbnail rounded-circle"
+                             style="width: 80px; height: 80px; object-fit: cover;" />
+                    </div>
+
+                    @* User can edit his profile image from another place *@
+
+                    @* <div class="col-sm-8"> *@
+                    @*     <input type="file" asp-for="@Model.ApplicationUser.Image" class="file-upload-default" id="ImgInput" name="Image" accept="image/*" /> *@
+                    @*     <div class="input-group col-xs-12"> *@
+                    @*         <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image"> *@
+                    @*         <span class="input-group-append"> *@
+                    @*             <button class="file-upload-browse btn btn-primary" type="button">Upload</button> *@
+                    @*         </span> *@
+                    @*         <span asp-validation-for="@Model.ApplicationUser.Image" class="text-danger"></span> *@
+                    @*     </div> *@
+                    @* </div> *@
+
+                </div>
+
+                <!-- Optional: Hidden input to preserve old image filename -->
+                <input type="hidden" name="ExistingImg" value="@Model.ApplicationUser.Image" />
+
+                <button id="submitBtn" type="submit" class="btn btn-primary mr-2">Submit</button>
+                <a href="/Admin/Users" class="btn btn-light">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const form = document.getElementById("myForm");
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            if ($(form).valid())
+            {
+                form.submit();
+            }
+        });
+    </script>
+}

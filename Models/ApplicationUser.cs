@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 
 namespace Cinema.Models
 {
@@ -6,7 +7,8 @@ namespace Cinema.Models
     {
         public DateOnly DoB {  get; set; }
         public string Country { get; set; } = string.Empty;
-        List<MovieReviews> movieReviews { get; set; } =  [];
-
+        public string Image {  get; set; }= string.Empty;
+        public List<string> UserRoles { get; set; } = [];
+        public List<MovieReviews> movieReviews { get; set; } =  [];
     }
 }

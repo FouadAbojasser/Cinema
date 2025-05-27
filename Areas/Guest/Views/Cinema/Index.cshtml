@@ -1,0 +1,85 @@
+﻿@model List<ShowTime>
+
+<section class="breadcrumb-area">
+    <div class="container mx-auto px-4">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb-area-content">
+                    <h1>Cinema: Play Max</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="details-area px-4">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="details-overview">
+                <section id="weekly-schedule" class="mb-12">
+                    <h2 class="text-3xl text-white mb-6">Weekly Schedule</h2>
+                    <div id="schedule-timeline" class="flex flex-col gap-8">
+
+                        @for (int i = 0; i < 8; i++)
+                        {
+                            var day = DateOnly.FromDateTime(DateTime.Now.AddDays(i));
+                            var showTimesForDay = Model
+                            .Where(s => s.ShowDate == day)
+                            .GroupBy(s => s.MovieTheater.Movie.Id)
+                            .ToList();
+
+                            if (showTimesForDay.Any())
+                            {
+                                <div class="bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+                                    <h3 class="text-2xl text-white mb-4 border-b border-gray-700 pb-3">
+                                        @day.ToString("dddd d-MMM-yyyy")
+                                    </h3>
+
+                                    <div class="movies-for-day flex flex-col gap-4">
+                                        @foreach (var movieGroup in showTimesForDay)
+                                        {
+                                            var movie = movieGroup.First().MovieTheater.Movie;
+                                            var poster = movie.Images.Where(m => m.MovieId == movie.Id).FirstOrDefault(i => i.Type == "poster");
+                                            var genres = string.Join(", ", movie.Genres.Select(g => g.Title));
+
+                                            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-gray-700 rounded-lg">
+                                                <div class="single-portfolio-img position-relative">
+                                                    @if (poster != null)
+                                                    {
+                                                        <img src="~/img/posters/@poster.Name" alt="Poster Image" class="img-fluid" />
+                                                    }
+                                                    <a href="@movie.Trailer" class="popup-youtube">
+                                                        <i class="icofont icofont-ui-play"></i>
+                                                    </a>
+                                                </div>
+                                                @* <img src="~/img/posters/@poster?.Name" alt="@poster?.Name" class="w-24 h-36 object-cover rounded-md shadow-md flex-shrink-0"> *@
+                                                <div class="flex-grow">
+                                                    <h4>
+                                                        <a href="/Guest/Home/MovieDetails/@movie.Id" class="text-xl font-semibold text-white mb-1">
+                                                            @movie.Title
+                                                        </a>
+                                                    </h4>
+                                                    <p class="text-gray-400 text-sm mb-2">@genres | @movie.Duration</p>
+
+                                                    <div class="showtimes-for-movie flex flex-wrap gap-2">
+                                                        @foreach (var show in movieGroup)
+                                                        {
+                                                            <a href="#" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-1.5 px-3 rounded-md transition duration-300">
+                                                                @show.ShowTimeFrom.ToString("hh\\:mm tt")
+                                                            </a>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>

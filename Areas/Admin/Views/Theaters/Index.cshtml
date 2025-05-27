@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Actor>
+﻿@model IEnumerable<Theater>
 
 <div class="row">
 	<div class="col-md-12">
@@ -8,43 +8,37 @@
 					<thead>
 						<tr>
 							<th class="ml-5">ID</th>
-							<th>Image</th>
-							<th>Actor Name</th>
-							<th>Date of Birth</th>
-							<th>Gender</th>
-							<th>No of Movies</th>
+							<th>Theater Name</th>
+							<th>Address</th>
+							<th style="text-align:center">Rate</th>
+							<th style="text-align:center">No. of Seats</th>
+							<th style="text-align:center">No. of Movies</th>
 							<th>Actions</th>
 						</tr>
 					</thead>
 					<tbody>
 						@{
-
 							int count = 1;
 						}
-						
-						@foreach (var actor in Model)
-
+						@foreach (var theater in Model)
 						{
 
 							<tr>
 								<td>@(count++)</td>
-								<td class="py-1">
-									<img src="~/img/cast/avatar/@actor.Img" alt="image"
-										 style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;"/>
-								</td>
-								<td>@actor.Name</td>
-								<td>@actor.DoB.ToString("dd-MMM-yyyy")</td>
-								<td>@actor.Gender</td>
-								<td>@actor.NoOfMovies</td>
+								<td>@theater.Name</td>
+								<td>@theater.Address</td>
+								<td style ="text-align:center">@theater.Rate</td>
+								<td style="text-align:center">@theater.Seats</td>
+								<td style="text-align:center">@theater.MovieTheater.Count()</td>
 								<td>
 
 									<div class="d-flex align-items-center">
-										<a href="/Admin/Actors/Edit/@actor.Id" class="btn btn-success btn-sm btn-icon-text mr-3">
+										<a href="/Admin/Theaters/Edit/@theater.Id" class="btn btn-success btn-sm btn-icon-text mr-3">
 											Edit
 											<i class="typcn typcn-edit btn-icon-append"></i>
 										</a>
 
-										<a href="javascript:void(0);" onclick="confirmDelete(@actor.Id)" class="btn btn-danger btn-sm btn-icon-text">
+										<a href="javascript:void(0);" onclick="confirmDelete(@theater.Id)" class="btn btn-danger btn-sm btn-icon-text">
 											Delete
 											<i class="typcn typcn-delete-outline btn-icon-append"></i>
 										</a>
@@ -55,6 +49,7 @@
 
 						}
 
+
 					</tbody>
 				</table>
 			</div>
@@ -63,14 +58,14 @@
 </div>
 
 <!-- partial:partials/_settings-panel.html -->
-<a id="settings-trigger" href="/Admin/Actors/Create">
+<a id="settings-trigger" href="/Admin/Theaters/Create">
 	<h5 style="color: aliceblue; vertical-align:central; margin:0px">+</h5>
 </a>
 
 <script>
 	function confirmDelete(id) {
 		Swal.fire({
-			title: "Are you sure you want to delete this Actor?",
+			title: "Are you sure you want to delete this Theater?",
 			text: "You won't be able to revert this!",
 			icon: "warning",
 			showCancelButton: true,
@@ -81,7 +76,7 @@
 			if (result.isConfirmed) {
 				// Redirect to delete action
 				setTimeout(() => {
-					window.location.href = `/Admin/Actors/Delete/${id}`;
+					window.location.href = `/Admin/Theaters/Delete/${id}`;
 				}, 1500); // Wait for the alert to finish
 			}
 		});

@@ -4,6 +4,7 @@
     {
         public const string SuperAdmin = "SuperAdmin";
         public const string Admin = "Admin";
+        public const string Producer = "Producer";
         public const string Cinema = "Cinema";
         public const string Customer = "Customer";
     }
