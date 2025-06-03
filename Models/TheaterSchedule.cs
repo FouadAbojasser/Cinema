@@ -1,6 +1,6 @@
 ﻿namespace Cinema.Models
 {
-    public class ShowTime
+    public class TheaterSchedule
     {
         public int Id { get; set; }
         public DateOnly ShowDate { get; set; }
@@ -9,7 +9,7 @@
         //Foreign Key
         public int MovieId { get; set; }
         public int TheaterId { get; set; }
-        //Navigation Property
-        public MovieTheater MovieTheater { get; set; } = null!;
+        public Movie? Movie { get; set; }
+        public Theater? Theater { get; set; }
     }
 }

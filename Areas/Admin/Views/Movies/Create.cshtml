@@ -150,8 +150,8 @@
 
                 <!--Duration-->
                 <div class="form-group">
-                    <label for="Duration">Duration</label>
-                    <input type="text" class="form-control" asp-for="@Model.movie.Duration" placeholder="Duration">
+                    <label for="Duration">Duration (min)</label>
+                    <input type="number" class="form-control" asp-for="@Model.movie.Duration" placeholder="Duration">
                     <span asp-validation-for="@Model.movie.Duration" class="text-danger"></span>
                 </div>
 

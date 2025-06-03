@@ -17,7 +17,7 @@ namespace Cinema.Utility
 
         public Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            var smtpClient = new SmtpClient(_configuration["EmailSettingsGmail:SmtpServer"], int.Parse(_configuration["EmailSettingsGmail:Port"]))
+            var smtpClient = new SmtpClient(_configuration["EmailSettingsGmail:SmtpServer"], int.Parse(_configuration["EmailSettingsGmail:Port"]!))
             {
                 Credentials = new NetworkCredential(
                     _configuration["EmailSettingsGmail:SenderEmail"],
@@ -27,7 +27,7 @@ namespace Cinema.Utility
             };
 
             var mailMessage = new MailMessage(
-                from: _configuration["EmailSettingsGmail:SenderEmail"],
+                from: _configuration["EmailSettingsGmail:SenderEmail"]!,
                 to: email,
                 subject,
                 htmlMessage

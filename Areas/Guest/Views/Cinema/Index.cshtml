@@ -1,11 +1,12 @@
-﻿@model List<ShowTime>
+﻿@using Cinema.Models.ViewModels
+@model TheatersWithScheduleVM
 
 <section class="breadcrumb-area">
     <div class="container mx-auto px-4">
         <div class="row">
             <div class="col-lg-12">
                 <div class="breadcrumb-area-content">
-                    <h1>Cinema: Play Max</h1>
+                    <h1>Cinema: @Model.Theater.Name </h1>
                 </div>
             </div>
         </div>
@@ -23,9 +24,9 @@
                         @for (int i = 0; i < 8; i++)
                         {
                             var day = DateOnly.FromDateTime(DateTime.Now.AddDays(i));
-                            var showTimesForDay = Model
+                            var showTimesForDay = Model.TheaterSchedules
                             .Where(s => s.ShowDate == day)
-                            .GroupBy(s => s.MovieTheater.Movie.Id)
+                            .GroupBy(s => s.Movie!.Id)
                             .ToList();
 
                             if (showTimesForDay.Any())
@@ -38,7 +39,7 @@
                                     <div class="movies-for-day flex flex-col gap-4">
                                         @foreach (var movieGroup in showTimesForDay)
                                         {
-                                            var movie = movieGroup.First().MovieTheater.Movie;
+                                            var movie = movieGroup.First().Movie!;
                                             var poster = movie.Images.Where(m => m.MovieId == movie.Id).FirstOrDefault(i => i.Type == "poster");
                                             var genres = string.Join(", ", movie.Genres.Select(g => g.Title));
 

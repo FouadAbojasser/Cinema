@@ -14,7 +14,7 @@ namespace Cinema.Repositories
         public IApplicationUserRepository ApplicationUser { get; private set; }
         public IMovieRatesRepository MovieRates { get; private set; }
         public ITheaterRepository Theater { get; private set; }
-        public IShowTimeRepository ShowTime {  get; private set; }
+        public ITheaterScheduleRepository TheaterSchedule {  get; private set; }
         public IMovieTheaterRepository MovieTheater { get; private set; }
         public UnitOfWork(ApplicationDbContext dbContext)
         {
@@ -28,7 +28,7 @@ namespace Cinema.Repositories
             ApplicationUser = new ApplicationUserRepository(_dbcontext);
             MovieRates = new MovieRatesRepositorycs(_dbcontext);
             Theater = new TheaterRepository(_dbcontext);
-            ShowTime = new ShowTimeRepository(_dbcontext);
+            TheaterSchedule = new TheaterScheduleRepository(_dbcontext);
             MovieTheater = new MovieTheaterRepository(_dbcontext);
         }
       

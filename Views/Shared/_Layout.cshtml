@@ -45,7 +45,7 @@
 							<option value="Cinema">Cinemas</option>
 						</select>
 
-						<input type="text" name="searchText" id="searchText" oninput="toggleSearchButton()" />
+						<input type="text" name="searchText" id="searchText" placeholder="Search here ..." oninput="toggleSearchButton()" />
 
 						<button type="submit" id="searchButton" style="display: none;">
 							<i class="icofont icofont-search"></i>
@@ -81,15 +81,19 @@
 							<li>
 								<a class="@(currentController == "Cinema" && currentAction == "Index" ? "active" : "")" href="#">Cinemas<i class="icofont icofont-simple-down"></i></a>
 								<ul>
-									<li><a href="/Guest/Cinema/Index">Play Max</a></li>
-									<li><a href="#">Cinema 2</a></li>
+									@foreach (var cinema in Model.ListOfTheater)
+									{
+										
+										<li><a href="/Guest/Cinema/Index/@cinema.Id">@cinema.Name</a></li>
+									}
+									
 								</ul>
 							</li>
 							<li><a class="@(currentController == "Home" && currentAction == "Movies" ? "active" : "")" href="/Guest/Home/Movies">Movies</a></li>
 							@{
 								if (User!.IsInRole(SD.SuperAdmin))
 								{
-									<li><a class="" href="/Admin/Home/Index">Admin</a></li>
+									<li><a class="" target="_blank" href="/Admin/Home/Index">Admin</a></li>
 								}
 							}
 							@* <li><a class="@(currentAction == "TVSeries" ? "active" : "")" href="/Home/TVSeries">TV Series</a></li> *@

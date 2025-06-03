@@ -190,7 +190,7 @@
 								<div class="transformers-left">
 									Cast:
 								</div>
-								<div class="transformers-right d-flex">
+								<div class="slide-cast">
 									@foreach (var actor in @Model.Movie.Actors)
 									{
 										<div class="single-slide-cast mx-2">
@@ -226,7 +226,7 @@
 								</div>
 							</li>
 
-							@if (Model.Movie.MovieTheater.Any())
+							@if (Model.Movie.Theaters.Any())
 							{
 								<table class="table" style="margin-top:10px">
 									<thead >
@@ -238,13 +238,13 @@
 										</tr>
 									</thead>
 									<tbody>
-										@foreach (var item in Model.Movie.MovieTheater)
+										@foreach (var item in Model.Movie.Theaters)
 										{
 											<tr>
-												<td style="border-top:none; padding:0; padding-top:5px">@item.Theater.Name</td>
-												<td style="border-top:none; text-align:center; padding:0; padding-top:5px">@item.StartDate?.ToString("dd-MMM-yyyy")</td>
-												<td style="border-top:none; text-align:center; padding:0; padding-top:5px">@item.EndDate?.ToString("dd-MMM-yyyy")</td>
-												<td style="border-top:none; text-align:center; padding:0; padding-top:5px">@(item.TotalNumberOfTickets - item.ReservedTickets)</td>
+												<td style="border-top:none; padding:0; padding-top:5px">@item.Name</td>
+												@* <td style="border-top:none; text-align:center; padding:0; padding-top:5px">@item.StartDate?.ToString("dd-MMM-yyyy")</td> *@
+												@* <td style="border-top:none; text-align:center; padding:0; padding-top:5px">@item.EndDate?.ToString("dd-MMM-yyyy")</td> *@
+												@* <td style="border-top:none; text-align:center; padding:0; padding-top:5px">@(item.TotalNumberOfTickets - item.ReservedTickets)</td> *@
 											</tr>
 										}
 									</tbody>
@@ -605,26 +605,37 @@
 			
 			<form action="/Guest/Cinema/AddMovieToCinema" method="post">
 				<div class="modal-body">
-					<div class="mb-3">
-						<input type="hidden" name="MovieId" value="@Model.Movie.Id"
-						<label for="startDate" class="form-label">Start Date</label>
-						<input type="date" class="form-control bg-dark text-white border-secondary" id="startDate" name="StartDate" required>
-					</div>
 
 					<div class="mb-3">
-						<label for="endDate" class="form-label">End Date</label>
-						<input type="date" class="form-control bg-dark text-white border-secondary" id="endDate" name="EndDate" required>
+						<input type="hidden" name="MovieId" value="@Model.Movie.Id" />
 					</div>
 
-					<div class="mb-3">
-						<label for="totalTickets" class="form-label">Total Number of Tickets</label>
-						<input type="number" class="form-control bg-dark text-white border-secondary" id="totalTickets" name="TotalTickets" required>
-					</div>
+					@* <div class="mb-3"> *@
+					@* 	<label for="startDate" class="form-label">Start Date</label> *@
+					@* 	<input type="date" class="form-control bg-dark text-white border-secondary" id="startDate" name="StartDate" required> *@
+					@* </div> *@
+
+					@* <div class="mb-3"> *@
+					@* 	<label for="endDate" class="form-label">End Date</label> *@
+					@* 	<input type="date" class="form-control bg-dark text-white border-secondary" id="endDate" name="EndDate" required> *@
+					@* </div> *@
+
+					@* <div class="mb-3"> *@
+					@* 	<label for="totalTickets" class="form-label">Total Number of Tickets</label> *@
+					@* 	<input type="number" class="form-control bg-dark text-white border-secondary" id="totalTickets" name="TotalTickets" required> *@
+					@* </div> *@
 
 					<div class="mb-3">
 						<label for="cinema" class="form-label">Cinema</label>
-						<input type="text" class="form-control bg-dark text-white border-secondary" id="cinema" name="CinemaId" required>
+						<select class="form-select bg-dark text-white border-secondary" id="cinema" name="CinemaId" required>
+							<option value="">-- Select Cinema --</option>
+							@foreach (var theater in Model.ListOfTheater)
+							{
+								<option value="@theater.Id">@theater.Name</option>
+							}
+						</select>
 					</div>
+
 				</div>
 
 				<div class="modal-footer border-secondary">
@@ -643,27 +654,58 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-	
-
 <!-- Bootstrap JS Bundle (includes Popper) -->
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 
 	@if (TempData["SingleMovie"] != null)
-{
-	<script>
-		Swal.fire({
-			position: "center",
-			icon: "success",
-				title: "@TempData["SingleMovie"]",
-			showConfirmButton: false,
-			timer: 2000,
-			background: "#1e1e1e", // dark background
-			color: "#ffffff", // white text
-			iconColor: "#00ff00" // optional: change icon color for dark mode
-		});
-	</script>
-}
+	{
+		<script>
+			Swal.fire({
+				position: "center",
+				icon: "success",
+					title: "@TempData["SingleMovie"]",
+				showConfirmButton: false,
+				timer: 2000,
+				background: "#1e1e1e", // dark background
+				color: "#ffffff", // white text
+				iconColor: "#00ff00" // optional: change icon color for dark mode
+			});
+		</script>
+	}
+
+	@if (TempData["Notification"] != null)
+	{
+		<script>
+			Swal.fire({
+				position: "center",
+				icon: "success",
+				title: "@TempData["Notification"]",
+				showConfirmButton: false,
+				timer: 2000,
+				background: "#1e1e1e", // dark background
+				color: "#ffffff", // white text
+				iconColor: "#00ff00" // optional: change icon color for dark mode
+			});
+		</script>
+	}
+
+	@if (TempData["Notification-error"] != null)
+	{
+		<script>
+			Swal.fire({
+				position: "center",
+				icon: "error",
+				iconColor: "#FF0000",
+				title: "@TempData["Notification-error"]",
+				showConfirmButton: false,
+				timer: 4000,
+				background: "#1e1e1e", // dark background
+				color: "#ffffff", // white text
+			});
+		</script>
+	}
 
 
 
@@ -789,6 +831,5 @@
 		});
 	});
 </script>
-
 
 }

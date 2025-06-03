@@ -11,7 +11,7 @@
         IApplicationUserRepository ApplicationUser { get; }
         IMovieRatesRepository MovieRates { get; }
         ITheaterRepository Theater { get; }
-        IShowTimeRepository ShowTime { get; }
+        ITheaterScheduleRepository TheaterSchedule { get; }
         IMovieTheaterRepository MovieTheater { get; }
         
     }

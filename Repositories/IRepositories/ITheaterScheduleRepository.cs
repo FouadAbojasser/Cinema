@@ -2,7 +2,7 @@
 
 namespace Cinema.Repositories.IRepositories
 {
-    public interface IShowTimeRepository : IRepository<ShowTime>
+    public interface ITheaterScheduleRepository : IRepository<TheaterSchedule>
     {
     }
 }

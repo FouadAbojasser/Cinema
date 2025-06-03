@@ -29,10 +29,25 @@
 								<td>@theater.Address</td>
 								<td style ="text-align:center">@theater.Rate</td>
 								<td style="text-align:center">@theater.Seats</td>
-								<td style="text-align:center">@theater.MovieTheater.Count()</td>
+								<td style="text-align:center">@theater.Movies.Count()</td>
 								<td>
 
 									<div class="d-flex align-items-center">
+										@if (theater.Movies.Count() > 0)
+										{
+											<a href="/Admin/Theaters/Schedule/@theater.Id" class="btn btn-primary btn-sm btn-icon-text mr-3">
+												<i class="typcn typcn-document btn-icon-prepend"></i>
+												Schedule
+											</a>
+										}
+										else
+										{
+											<a class="btn btn-secondary btn-sm btn-icon-text mr-3 disabled" style="pointer-events: none; opacity: 0.6;">
+												<i class="typcn typcn-document btn-icon-prepend"></i>
+												Schedule
+											</a>
+										}
+
 										<a href="/Admin/Theaters/Edit/@theater.Id" class="btn btn-success btn-sm btn-icon-text mr-3">
 											Edit
 											<i class="typcn typcn-edit btn-icon-append"></i>

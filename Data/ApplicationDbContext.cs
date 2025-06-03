@@ -26,15 +26,12 @@ namespace Cinema
         public DbSet<Series> Series { get; set; }
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Theater> Theaters { get; set; }
-        public DbSet<MovieTheater> MovieTheaters { get; set; }
         public DbSet<MovieReviews> MovieReviews { get; set; }
         public DbSet<MovieRates> MovieRates { get; set; }
         public DbSet<OTP> OTPs { get; set; }
-        public DbSet<ShowTime> ShowTimes { get; set; }
-        
-
-
-
+        public DbSet<TheaterSchedule> TheaterSchedules { get; set; }
+       
+       
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Must be Added to avoid EF skipping configuring Identity tables
@@ -79,24 +76,24 @@ namespace Cinema
             .WithOne(e => e.Director);
 
 
-            modelBuilder.Entity<MovieTheater>()
-             .HasKey(mt => new { mt.MovieId, mt.TheaterId }); // Composite Primary Key
+            //modelBuilder.Entity<MovieTheater>()
+            // .HasKey(mt => new { mt.MovieId, mt.TheaterId }); // Composite Primary Key
 
-            modelBuilder.Entity<MovieTheater>()
-               .HasOne(mt => mt.Movie)
-               .WithMany(m => m.MovieTheater)
-               .HasForeignKey(mt => mt.MovieId);
+            //modelBuilder.Entity<MovieTheater>()
+            //   .HasOne(mt => mt.Movie)
+            //   .WithMany(m => m.Theaters)
+            //   .HasForeignKey(mt => mt.MovieId);
 
-            modelBuilder.Entity<MovieTheater>()
-                .HasOne(mt => mt.Theater)
-                .WithMany(t => t.MovieTheater)
-                .HasForeignKey(mt => mt.TheaterId);
+            //modelBuilder.Entity<MovieTheater>()
+            //    .HasOne(mt => mt.Theater)
+            //    .WithMany(t => t.Movies)
+            //    .HasForeignKey(mt => mt.TheaterId);
 
-            // One-to-many: MovieTheater ↔ ShowTime
-            modelBuilder.Entity<ShowTime>()
-                .HasOne(st => st.MovieTheater)
-                .WithMany(mt => mt.ShowTimes)
-                .HasForeignKey(st => new { st.MovieId, st.TheaterId });
+            //// One-to-many: MovieTheater ↔ ShowTime
+            //modelBuilder.Entity<TheaterSchedule>()
+            //    .HasOne(st => st.MovieTheater)
+            //    .WithMany(mt => mt.TheaterSchedules)
+            //    .HasForeignKey(st => new { st.MovieId, st.TheaterId });
         }
 
     }

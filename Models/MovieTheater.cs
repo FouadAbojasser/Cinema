@@ -8,11 +8,11 @@ namespace Cinema.Models
         public Movie Movie { get; set; } = null!;
         public int TheaterId { get; set; }
         public Theater Theater { get; set; } = null!;
-        public int? TotalNumberOfTickets { get; set; }
-        public int ReservedTickets { get; set; }
-        public DateOnly? StartDate { get; set; }
-        public DateOnly? EndDate { get; set; }
-        public ICollection<ShowTime> ShowTimes { get; set; } = [];
+        //public int? TotalNumberOfTickets { get; set; }
+        //public int ReservedTickets { get; set; }
+        //public DateOnly? StartDate { get; set; }
+        //public DateOnly? EndDate { get; set; }
+        //public ICollection<TheaterSchedule> TheaterSchedules { get; set; } = [];
 
     }
 }

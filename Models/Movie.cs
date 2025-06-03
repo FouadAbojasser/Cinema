@@ -14,7 +14,7 @@ namespace Cinema.Models
         public string Trailer { get; set; } = string.Empty;
         public DateOnly? ProductionDate { get; set; }
         public DateOnly? ReleaseDate { get; set; } 
-        public string Duration { get; set; } = string.Empty;
+        public double Duration { get; set; }
         public double Rate { get; set; }
         public string Country { get; set; } = string.Empty;
         public string Language { get; set; } = string.Empty;
@@ -24,9 +24,9 @@ namespace Cinema.Models
         public ICollection<Genre> Genres { get; set; } = [];
         public ICollection<Image> Images { get; set; } = [];
         public ICollection<Actor> Actors { get; set; } = [];
-        //public ICollection<Theater> Theaters { get; set; } = [];
         public ICollection<MovieReviews> MovieReviews { get; set; } = [];
-        public ICollection<MovieTheater> MovieTheater { get; set; } = [];
+        public ICollection<Theater> Theaters { get; set; } = [];
+        public ICollection<TheaterSchedule> TheaterSchedules { get; set;} = [];
     }
 
 }

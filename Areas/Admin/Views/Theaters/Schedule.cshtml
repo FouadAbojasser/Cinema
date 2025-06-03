@@ -1,0 +1,134 @@
+﻿@model IEnumerable<TheaterSchedule>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="table-responsive pt-3">
+				<table class="table table-striped project-orders-table">
+					<thead>
+						<tr class="text-center">
+							<th>No.</th>
+							<th>Date</th>
+							<th>Show Start</th>
+							<th>Show End</th>
+							<th>Duration</th>
+							<th >Movie</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						@{
+							
+							int count = 1;
+						}
+
+						@foreach (var schedule in Model)
+
+						{
+							
+							<tr class="text-center">
+								<td>@(count++)</td>
+
+								<td>@schedule.ShowDate</td>
+
+								<td>@schedule.ShowTimeFrom.ToString("hh\\:mm tt")</td>
+
+								<td>@schedule.ShowTimeTo.ToString("hh\\:mm tt")</td>
+								@{
+									var duration = schedule.ShowTimeTo - schedule.ShowTimeFrom;
+								}
+								<td>
+									@(duration.Hours > 0 ? $"{duration.Hours} hour{(duration.Hours > 1 ? "s" : "")} " : "")
+									@(duration.Minutes > 0 ? $"{duration.Minutes} minute{(duration.Minutes > 1 ? "s" : "")}" : "")
+								</td>
+								
+								@{
+									var poster = schedule.Movie!.Images.Where(m => m.MovieId == schedule.MovieId).FirstOrDefault(i => i.Type == "poster");
+								}
+
+								<td class="py-1 text-center align-middle">
+									<div class="position-relative d-inline-block" style="width: 60px; height: 80px;">
+										@if (poster != null)
+										{
+											<img src="~/img/posters/@poster.Name" alt="Poster Image"
+												 class="rounded object-fit-cover w-100 h-100 shadow" />
+										}
+										<a href="@schedule.Movie.Trailer"
+										   class="popup-youtube position-absolute top-50 start-50 translate-middle">
+											<i class="icofont icofont-ui-play"></i>
+										</a>
+									</div>
+									<a href="/Guest/Home/MovieDetails/@schedule.MovieId"
+									   target="_blank"
+									   class="mt-2 mb-0 fw-medium d-block text-decoration-none">
+										@schedule.Movie.Title
+									</a>
+								</td>
+
+
+
+
+
+								<td>
+									<a href="/Admin/Theaters/EditSchedule/@schedule.Id" class="btn btn-success btn-sm btn-icon-text mr-3">
+										Edit 
+								 		<i class="typcn typcn-edit btn-icon-append"></i> 
+								 	</a>
+									<a href="javascript:void(0);" onclick="confirmDelete(@schedule.Id)" class="btn btn-danger btn-sm btn-icon-text">
+										Delete 
+								 		<i class="typcn typcn-delete-outline btn-icon-append"></i> 
+								 	</a> 
+								</td> 
+
+							</tr>
+
+						}
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- partial:partials/_settings-panel.html -->
+<a id="settings-trigger" href="/Admin/Theaters/AddSchedule/@Model.FirstOrDefault()!.TheaterId">
+	<h5 style="color: aliceblue; vertical-align:central; margin:0px">+</h5>
+</a>
+
+<script>
+	function confirmDelete(id) {
+		Swal.fire({
+			title: "Are you sure you want to delete this show time?",
+			text: "You won't be able to revert this!",
+			icon: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#3085d6",
+			cancelButtonColor: "#d33",
+			confirmButtonText: "Yes, delete it!"
+		}).then((result) => {
+			if (result.isConfirmed) {
+				// Redirect to delete action
+				setTimeout(() => {
+					window.location.href = `/Admin/Theaters/DeleteSchedule/${id}`;
+				}, 1500); // Wait for the alert to finish
+			}
+		});
+	}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+		<script>
+			Swal.fire({
+				position: "center",
+				icon: "success",
+				title: "@TempData["SuccessMessage"]",
+				showConfirmButton: false,
+				timer: 1500
+			});
+		</script>
+}

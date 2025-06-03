@@ -60,7 +60,7 @@ namespace Cinema.Areas.Identity.Controllers
             {
                 //Update Old Comment
                 UserReview.Comment= review.Comment;
-                review.CreatedAt = DateTime.UtcNow;
+                UserReview.CreatedAt = DateTime.UtcNow;
                 _unitOfWork.MovieReviews.Update(UserReview);
                 await _unitOfWork.MovieReviews.CommitAsync();
                 TempData["SingleMovie"] = "Yor Comment has been Updated!";

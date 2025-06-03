@@ -4,6 +4,7 @@ using Cinema;
 using Cinema.Models;
 using Cinema.Models.ViewModels;
 using Cinema.Repositories.IRepositories;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -55,6 +56,7 @@ public class HomeController : Controller
             e=>e.OrderByDescending(x=>x.ReleaseDate)
             ).Take(6);
 
+       
 
         //var TopRated = _dbcontext.Movies
         //    .Include(e => e.Actors) 
@@ -114,6 +116,7 @@ public class HomeController : Controller
             o => o.OrderByDescending(e => e.Rate).ThenByDescending(e => e.ReleaseDate)
             ).Take(4);
 
+        var AllCinemas = _unitOfWork.Theater.Get();
 
         var MoviesReturnData = new MoviesWithFiltersVM()
         {
@@ -123,6 +126,7 @@ public class HomeController : Controller
             CommingSoon = CommingSoon.ToList(),
             RecentlyReleased = RecentlyReleased.ToList(),
             TopTrailerSection = TopTrailerSection.ToList(),
+            ListOfTheater = AllCinemas.ToList(),
 
         };
 
@@ -146,15 +150,13 @@ public class HomeController : Controller
 
        
         var movie = _unitOfWork.Movie.GetOne(
-            e => e.Id == id,
-            query => query
-            .Include(e => e.Images)
-            .Include(e => e.Genres)
-            .Include(e => e.Actors)
-            .Include(e => e.Director)
-            .Include(e => e.MovieTheater)
-            .ThenInclude(mt => mt.Theater)
-            .Include(r => r.MovieReviews)); //Deep Include of Navigation Property Movie->Review->ApplicationUser
+            e => e.Id == id, 
+            [e => e.Images,
+            e => e.Genres,
+            e => e.Actors,
+            e => e.Director,
+            e => e.Theaters,
+            r => r.MovieReviews]);
 
         if (movie == null)
         {
@@ -178,9 +180,9 @@ public class HomeController : Controller
             e => e.Id != id && e.Genres.Select(g => g.Id).Intersect(movieGenreIds).Count() >= 2,
             query => query
             .Include(e => e.Images)
-            .Include(e => e.MovieTheater)
-                .ThenInclude(mt => mt.Theater)
-);
+            .Include(e => e.Theaters));
+
+        var AllCinemas = _unitOfWork.Theater.Get();
 
         var movieWithSimilarMoviesWithReviews = new MovieWithSimilarMoviesWithReviewsVM
         {
@@ -189,6 +191,8 @@ public class HomeController : Controller
             SimilarMovies = similarMovies.ToList(),
 
             MovieReviews = movie.MovieReviews.ToList(),
+
+            ListOfTheater = AllCinemas.ToList(),
 
         };
 
@@ -229,10 +233,13 @@ public class HomeController : Controller
           
         var geners = _unitOfWork.Genre.Get();
 
+        var AllCinemas = _unitOfWork.Theater.Get();
+
         var moviesWithGeners = new MoviesWithGenresVM
         {
             Movies = movies.ToList(),
             Genres = geners.ToList(),
+            ListOfTheater = AllCinemas.ToList(),
         };
         return View(moviesWithGeners);
        
@@ -245,6 +252,13 @@ public class HomeController : Controller
         {
             if (searchTable == "Cinema")
             {
+                var resultedCinemas = _unitOfWork.Theater.GetOne(e=>e.Name.Contains(searchText));
+                if (resultedCinemas is not null)
+                {
+                    return RedirectToAction("Index", "Cinema", new { Area = "Guest", id = resultedCinemas.Id });
+                }
+             
+                return BadRequest();
 
             }
             if (searchTable == "Movie")
@@ -266,6 +280,8 @@ public class HomeController : Controller
 
     }
 
+
+   
 
 
 

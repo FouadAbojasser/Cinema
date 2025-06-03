@@ -3,10 +3,10 @@ using Cinema.Repositories.IRepositories;
 
 namespace Cinema.Repositories
 {
-    public class ShowTimeRepository : Repository<ShowTime>, IShowTimeRepository
+    public class TheaterScheduleRepository : Repository<TheaterSchedule>, ITheaterScheduleRepository
     {
         private readonly ApplicationDbContext _dbContext;
-        public ShowTimeRepository(ApplicationDbContext dbContext) : base(dbContext)
+        public TheaterScheduleRepository(ApplicationDbContext dbContext) : base(dbContext)
         {
             _dbContext = dbContext;
         }
