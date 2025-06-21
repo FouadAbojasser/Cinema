@@ -216,10 +216,13 @@ public class HomeController : Controller
             [m => m.Actors, e => e.Images]
             );
 
+        var listOfTheaters = _unitOfWork.Theater.Get();
+
         var ActorWithMovies = new ActorWithMovies
         {
             Actor = actor,
-            ActorMovies = actorMovies.ToList()
+            ActorMovies = actorMovies.ToList(),
+            ListOfTheater = listOfTheaters.ToList(),
         };
 
         return View(ActorWithMovies);

@@ -3,15 +3,16 @@
 <div class="col-12 grid-margin stretch-card">
     <div class="card">
         <div class="card-body">
-            <h4 class="card-title">Add New Show Schedule for: @Model.Theater!.Name</h4>
+            <h4 class="card-title">Edit Show Schedule for: @Model.Theater!.Name</h4>
 
 
-              <form method="post" action="/Admin/Theaters/AddSchedule">
+            <form method="post" action="/Admin/Theaters/EditSchedule">
 
                 <div class="form-group">
                     <label for="Name">Cinema Name</label>
                     <input type="text" readonly class="form-control" asp-for="@Model.Theater!.Name">
                     <input type="hidden" class="form-control" asp-for="@Model.Theater.Id">
+                    <input type="hidden" class="form-control" asp-for="@Model.TheaterSchedule!.Id">
                 </div>
 
                 <div class="form-group">
@@ -29,10 +30,12 @@
                         </div>
 
                         <!-- Visible input for movie title -->
-                        <input type="text" id="movieTitleInput" asp-for="@Model.TheaterSchedule!.Movie!.Title" value="@Model.Theater.Movies.FirstOrDefault(m=>m.Id==Model.TheaterSchedule!.MovieId).Title" class="form-control" readonly>
+                        <input type="text" id="movieTitleInput" asp-for="@Model.TheaterSchedule!.Movie!.Title" value="@Model.Theater.Movies.FirstOrDefault(m=>m.Id==Model.TheaterSchedule!.MovieId)!.Title" class="form-control" readonly>
 
                         <!-- Hidden input for movie ID bound to the model -->
                         <input type="hidden" asp-for="TheaterSchedule.MovieId" id="movieIdInput" />
+
+                       
                     </div>
                 </div>
 

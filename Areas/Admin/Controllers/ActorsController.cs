@@ -81,7 +81,7 @@ namespace Cinema.Areas.Admin.Controllers
 
                 await _unitOfWork.Actor.CommitAsync();
                
-                TempData["SuccessMessage"] = "Created successfully";
+                TempData["SuccessMessage"] = "Created Successfully";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -159,7 +159,7 @@ namespace Cinema.Areas.Admin.Controllers
 
                 await _unitOfWork.Actor.CommitAsync();
 
-                TempData["SuccessMessage"] = "Edited successfully";
+                TempData["SuccessMessage"] = "Edited Successfully";
 
                 return RedirectToAction(nameof(Index));
             }

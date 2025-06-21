@@ -13,6 +13,7 @@
 							<th style="text-align:center">Rate</th>
 							<th style="text-align:center">No. of Seats</th>
 							<th style="text-align:center">No. of Movies</th>
+							<th style="text-align:center">Movies</th>
 							<th>Actions</th>
 						</tr>
 					</thead>
@@ -30,6 +31,20 @@
 								<td style ="text-align:center">@theater.Rate</td>
 								<td style="text-align:center">@theater.Seats</td>
 								<td style="text-align:center">@theater.Movies.Count()</td>
+								<td style="text-align:center">
+									<div class="input-group-prepend">
+										<button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+											Movies List
+										</button>
+										<div class="dropdown-menu">
+											@foreach (var movie in theater.Movies)
+											{
+												<a class="dropdown-item movie-option" data-title="@movie.Title">@movie.Title</a>
+											}
+										</div>
+									</div>
+								</td>
+
 								<td>
 
 									<div class="d-flex align-items-center">

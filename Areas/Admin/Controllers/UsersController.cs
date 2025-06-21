@@ -99,7 +99,7 @@ namespace Cinema.Areas.Admin.Controllers
                 var rolesToRemove = currentRoles.Except(applicationUserVM.AvailableRoles);
                 await _userManager.RemoveFromRolesAsync(userInDb, rolesToRemove);
 
-                TempData["SuccessMessage"] = "User Editted Successfully!";
+                TempData["SuccessMessage"] = "Edited Successfully!";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -140,7 +140,7 @@ namespace Cinema.Areas.Admin.Controllers
 
             await _userManager.DeleteAsync(userInDb);
 
-            TempData["SuccessMessage"] = "Deleted successfully";
+            TempData["SuccessMessage"] = "Deleted Successfully";
 
             return RedirectToAction(nameof(Index));
 

@@ -41,7 +41,7 @@ namespace Cinema.Areas.Admin.Controllers
 
                 await _unitOfWork.Theater.CommitAsync();
 
-                TempData["SuccessMessage"] = "Created successfully";
+                TempData["SuccessMessage"] = "Created Successfully";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -76,7 +76,7 @@ namespace Cinema.Areas.Admin.Controllers
 
                 await _unitOfWork.Theater.CommitAsync();
 
-                TempData["SuccessMessage"] = "Edited successfully";
+                TempData["SuccessMessage"] = "Edited Successfully";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -161,6 +161,8 @@ namespace Cinema.Areas.Admin.Controllers
 
             await _unitOfWork.TheaterSchedule.CommitAsync();
 
+            TempData["SuccessMessage"] = "Added Successfully";
+
             return RedirectToAction(nameof(Schedule), new { Id = theaterSchedule.TheaterId});
 
         }
@@ -177,7 +179,10 @@ namespace Cinema.Areas.Admin.Controllers
             var theaterId = TheaterSchedule.TheaterId;
 
             _unitOfWork.TheaterSchedule.Delete(TheaterSchedule);
+
             await _unitOfWork.TheaterSchedule.CommitAsync();
+
+            TempData["SuccessMessage"] = "Deleted Successfully";
 
             return RedirectToAction(nameof(Schedule), new { id = theaterId });
 
@@ -205,7 +210,35 @@ namespace Cinema.Areas.Admin.Controllers
         }
 
 
+        [HttpPost]
+        public async Task<IActionResult> EditScheduleAsync(TheaterSchedule theaterSchedule)
+        {
+            var TheaterScheduleInDb = _unitOfWork.TheaterSchedule.GetOne(s => s.Id == theaterSchedule.Id);
 
+            var movie = _unitOfWork.Movie.GetOne(m => m.Id == theaterSchedule.MovieId);
+
+            if (TheaterScheduleInDb is null)
+            {
+                return NotFound();
+            }
+
+            TheaterScheduleInDb.ShowDate = theaterSchedule.ShowDate;
+            TheaterScheduleInDb.ShowTimeFrom = theaterSchedule.ShowTimeFrom;
+            TheaterScheduleInDb.MovieId = theaterSchedule.MovieId;
+
+            if (movie is not null)
+            {
+                TheaterScheduleInDb.ShowTimeTo=theaterSchedule.ShowTimeFrom.AddMinutes(movie.Duration + 15);
+                TheaterScheduleInDb.Movie = movie;
+            }
+
+            _unitOfWork.TheaterSchedule.Update(TheaterScheduleInDb);
+            await _unitOfWork.TheaterSchedule.CommitAsync();
+
+            TempData["SuccessMessage"] = "Editied Successfully";
+
+            return RedirectToAction(nameof(Schedule),new {Id = TheaterScheduleInDb.TheaterId });
+        }
 
 
     }

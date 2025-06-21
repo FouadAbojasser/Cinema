@@ -122,13 +122,13 @@
 
 @if (TempData["SuccessMessage"] != null)
 {
-		<script>
-			Swal.fire({
-				position: "center",
-				icon: "success",
-				title: "@TempData["SuccessMessage"]",
-				showConfirmButton: false,
-				timer: 1500
-			});
-		</script>
+	<script>
+		Swal.fire({
+			position: "center",
+			icon: "success",
+			title: "@TempData["SuccessMessage"]",
+			showConfirmButton: false,
+			timer: 1500
+		});
+	</script>
 }
